@@ -243,8 +243,8 @@
   };  
 
   # system environment
-  services.accounts-daemon.enable = true;
-  services.gnome.gnome-online-accounts.enable = true;
+  #services.accounts-daemon.enable = true;
+  #services.gnome.gnome-online-accounts.enable = true;
   #environment.variables = {
   #  WEBKIT_FORCE_SANDBOX = "0";
   #};
