@@ -93,6 +93,5 @@
     enable = true;
     userName = "FRX-00";
     userEmail = "nigetx1016@gmail.com";
-    #userPassword = "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";
   };
 }
