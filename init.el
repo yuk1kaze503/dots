@@ -13,6 +13,8 @@
 
 (savehist-mode 1)
 ;;
+;; emacs magit
+
 ;; message log
 (setq message-log-max 5000)
 
