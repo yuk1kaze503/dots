@@ -89,9 +89,4 @@
     ];
   };
   
-  programs.git = {
-    enable = true;
-    userName = "FRX-00";
-    userEmail = "nigetx1016@gmail.com";
-  };
 }
