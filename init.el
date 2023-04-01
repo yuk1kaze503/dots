@@ -157,16 +157,6 @@
   :ensure t
   :config (global-set-key (kbd "C-x g") 'magit-status))
 
-;; ;; cc-vars
-;; (use-package cc-vars
-;;   :ensure nil
-;;   :config
-;;   (setq c-default-style '((java-mode . "java")
-;; 			  (awk-mode . "awk")
-;; 			  (cc-mode . "bsd")
-;; 			  (c-mode . "linux")
-;; 			  (other . "k&r")))
-;;   (setq-default c-basic-offset kang/indent-width))
 (setq-default c-basic-offset kang/indent-width)
 ;; c-mode-hook
 (add-hook 'c-mode-hook (lambda()
@@ -174,15 +164,9 @@
 			    (setq tab-width 8)
 			    (setq standard-indent 8)
 			    (setq ident-tabs-mode nil)))
-;; c++-mode-hook
-;; (add-hook 'cc-mode-hook (lambda()
-;; 			    ;;(setq-default)
-;; 			    (setq tab-width 2)
-;; 			    (setq standard-indent 2)
-;; 			    (setq ident-tabs-mode nil)))
 
 ;; terminal-emulator
-;; installed vterm-module at home.nix
+;; installed vterm-module in home.nix
 (use-package vterm
   :ensure t)
 
@@ -246,33 +230,10 @@
 	("M->" . company-select-last)
 	("C-;" . company-complete-common)))
 
-
 (use-package company-box
   :hook (company-mode . company-box-mode)
   :config
   (add-to-list 'company-box-frame-parameters '(font . "Iosevka-14")))
-
-
-;; lsp-mode
-;;(use-package lsp-mode
-;;  :ensure t
-;;  :init (yas-global-mode)
-;;  :hook ((rust-mode . lsp)
-;;        (go-mode .lsp-deferred))
-;;  :bind ("C-c h" . lsp-describe-thing-at-point)
-;;  :custom (lsp-rust-server 'rust-analyzer))
-;; (use-package lsp-ui
-;;   :ensure t
-;;   :config
-;;   ;;(lsp-ui-doc-position 'at-point)
-;;   ;;(lsp-ui-doc-max-width 120)
-;;   ;;(lsp-ui-doc-max-height 30)
-;;   (setq lsp-ui-doc-enable nil)
-;;   (setq lsp-ui-doc-header t)
-;;   (setq lsp-ui-doc-include-signature t)
-;;   (setq lsp-ui-sideline-show-code-actions nil)
-;;   (setq lsp-ui-sideline-show-diagnostics t)
-;;   (setq lsp-ui-sideline-delay 0.5))
 
 ;; eglot lsp
 (use-package eglot
