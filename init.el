@@ -20,11 +20,11 @@
 (setq read-process-output-max (* 2 1024 1024))
 (setq gc-cons-threshold 100000000)
 
-;; ;; for mac to run shell env
-;; (when (memq window-system '(mac ns x))
-;;   (exec-path-from-shell-initialize)
-;; ;; set meta key to command
-;;   (setq mac-command-modifier 'meta))
+;; for mac to run shell env
+(when (memq window-system '(mac ns x))
+  (exec-path-from-shell-initialize)
+;; set meta key to command
+  (setq mac-command-modifier 'meta))
 
 ;; frame-size
 (defun set-frame-size-according-to-resolution ()
@@ -111,12 +111,12 @@
 (use-package material-theme
   :ensure t
   :config ;(load-theme 'material-light t)
-  (set-frame-font "Sarasa Mono J-16"))
+  (set-frame-font "Sarasa Mono J-18"))
 
 (use-package color-theme-sanityinc-tomorrow
   :ensure t
   :config ;(load-theme 'sanityinc-tomorrow-day t)
-  (set-frame-font "Sarasa Mono J-16"))
+  (set-frame-font "Sarasa Mono J-18"))
 
 (use-package doom-themes
   :ensure t
@@ -124,7 +124,7 @@
   (setq doom-themes-enable-bold t)
   (setq doom-themes-enable-italic t)
   ;(load-theme 'doom-tokyo-night t)
-  (set-frame-font "Sarasa Mono J-16"))
+  (set-frame-font "Sarasa Mono J-18"))
 
 ;; ivy-mode
 (use-package ivy
