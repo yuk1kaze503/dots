@@ -103,9 +103,9 @@
 (use-package undo-tree
   :ensure)
 
-;; (add-to-list 'custom-theme-load-path "~/.emacs.d/everforest-theme")
-;; (load-theme 'everforest-hard-dark t)
-;; (set-frame-font "Sarasa Mono J-18")
+(add-to-list 'custom-theme-load-path "~/.emacs.d/everforest")
+(load-theme 'everforest-hard-dark t)
+(set-frame-font "Sarasa Mono J-18")
 
 
 (use-package material-theme
@@ -123,7 +123,7 @@
   :config
   (setq doom-themes-enable-bold t)
   (setq doom-themes-enable-italic t)
-  (load-theme 'doom-tokyo-night t)
+  ;(load-theme 'doom-tokyo-night t)
   (set-frame-font "Sarasa Mono J-16"))
 
 ;; ivy-mode
@@ -233,7 +233,10 @@
 (use-package company-box
   :hook (company-mode . company-box-mode)
   :config
+  (setq company-box-backends-colors '(:candidate "purple" :annotation "#7C4Dff"
+						 :select (:background "purple" :foreground "white")))
   (add-to-list 'company-box-frame-parameters '(font . "Iosevka-14")))
+
 
 ;; eglot lsp
 (use-package eglot
