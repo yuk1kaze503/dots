@@ -20,11 +20,11 @@
 (setq read-process-output-max (* 2 1024 1024))
 (setq gc-cons-threshold 100000000)
 
-;; for mac to run shell env
-(when (memq window-system '(mac ns x))
-  (exec-path-from-shell-initialize)
-;; set meta key to command
-  (setq mac-command-modifier 'meta))
+;; ;; for mac to run shell env
+;; (when (memq window-system '(mac ns x))
+;;   (progn (exec-path-from-shell-initialize)
+;; ;; set meta key to command
+;;   (setq mac-command-modifier 'meta)))
 
 ;; frame-size
 (defun set-frame-size-according-to-resolution ()
