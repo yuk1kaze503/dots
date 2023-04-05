@@ -71,6 +71,14 @@
 (setq indent-tabs-mode nil)
 (defvaralias 'c-basic-offset 'default-tab-width)
 
+;; my lisp functions
+
+;; insert date by %y%m%d %T
+(progn
+(defun insert-current-date () (interactive)
+    (insert (shell-command-to-string "echo -n $(date +%Y-%m-%d\" \"%T)")))
+(global-set-key "\C-x\M-d" 'insert-current-date))
+
 (require 'package)
 (setq package-enable-at-startup nil)
 (add-to-list 'package-archives
