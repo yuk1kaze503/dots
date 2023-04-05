@@ -79,6 +79,8 @@
   jetbrains-mono
   cascadia-code
   hack-font
+  noto-fonts-cjk-sans
+  noto-fonts-cjk-serif
   ];
   # Enable the X11 windowing system.
   services.xserver.enable = true;
@@ -138,7 +140,7 @@
   programs.zsh.ohMyZsh = {
     enable = true;
     plugins = [ "git" "man" "thefuck"];
-    theme = "ys";
+    theme = "lambda";
   };
   # tmux
   programs.tmux = {
