@@ -115,16 +115,15 @@
 (load-theme 'everforest-hard-dark t)
 (set-frame-font "Sarasa Mono J-18")
 
-
 (use-package material-theme
   :ensure t
   :config ;(load-theme 'material-light t)
-  (set-frame-font "Sarasa Mono J-18"))
+  )
 
 (use-package color-theme-sanityinc-tomorrow
   :ensure t
   :config ;(load-theme 'sanityinc-tomorrow-day t)
-  (set-frame-font "Sarasa Mono J-18"))
+  )
 
 (use-package doom-themes
   :ensure t
@@ -132,7 +131,7 @@
   (setq doom-themes-enable-bold t)
   (setq doom-themes-enable-italic t)
   ;(load-theme 'doom-tokyo-night t)
-  (set-frame-font "Sarasa Mono J-18"))
+  )
 
 ;; ivy-mode
 (use-package ivy
