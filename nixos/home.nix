@@ -22,12 +22,16 @@
   home.packages = with pkgs; [
     okular
     p7zip
-    gnomeExtensions.hide-top-bar-window
+    gnomeExtensions.hide-top-bar
     stdman
     emacsPackages.vterm
     thunderbird
     tree
+    libsForQt5.kdeconnect-kde
+    libsForQt5.yakuake
+    libsForQt5.fcitx5-qt
     nodePackages.typescript-language-server
+    nordic                      
   ];
 
   programs.neovim = {
@@ -88,5 +92,5 @@
       neogit
     ];
   };
-  
+ 
 }
