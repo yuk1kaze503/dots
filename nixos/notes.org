@@ -1,1 +1,5 @@
-test
+* failed that switch to kde.
+** 1. fcitx5 is not working.
+** 2. fcitx5-rime failed to launch.
+** 3. perl - locale setting is failed.
+<2023-04-05 Wed 19:27>
