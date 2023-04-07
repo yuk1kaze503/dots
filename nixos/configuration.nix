@@ -153,6 +153,7 @@
       set -g mode-keys emacs
       set -g status-keys emacs
       set -s escape-time 0
+      set -g mouse on
     '';
   };
   # Allow unfree packages
