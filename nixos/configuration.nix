@@ -208,6 +208,7 @@
     python310Packages.pip
     python-language-server
     jdk
+    kotlin
     chez
     nodejs
     nodePackages.typescript
@@ -217,6 +218,7 @@
     # lsp
     rust-analyzer
     gopls
+    kotlin-language-server
     emacsPackages.eglot-java
     # vm
     docker
