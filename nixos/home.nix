@@ -30,8 +30,9 @@
     libsForQt5.kdeconnect-kde
     libsForQt5.yakuake
     libsForQt5.fcitx5-qt
-    nodePackages.typescript-language-server
     nordic                      
+    ruby
+    rbenv
   ];
 
   programs.neovim = {

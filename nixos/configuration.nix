@@ -219,7 +219,8 @@
     rust-analyzer
     gopls
     kotlin-language-server
-    emacsPackages.eglot-java
+    java-language-server
+    nodePackages.typescript-language-server
     # vm
     docker
     qemu
