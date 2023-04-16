@@ -4,6 +4,9 @@
 
 { config, pkgs, ... }:
 
+let 
+  unstable = import <nixos-unstable> {};
+in
 {
   imports =
     [ # Include the results of the hardware scan.
@@ -206,21 +209,22 @@
     python310
     python310Packages.ipython
     python310Packages.pip
-    python-language-server
     jdk
     kotlin
     chez
-    nodejs
-    nodePackages.typescript
+    unstable.nodejs
+    unstable.nodePackages.npm
+    unstable.nodePackages.typescript
+    unstable.nodePackages.typescript-language-server
     rustup
     ocaml
     go
     # lsp
     rust-analyzer
     gopls
+    python310Packages.python-lsp-server
     kotlin-language-server
     java-language-server
-    nodePackages.typescript-language-server
     # vm
     docker
     qemu

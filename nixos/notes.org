@@ -1,3 +1,6 @@
 * 1. fcitx5 is not working.
 * 2. fcitx5-rime failed to launch.
 <2023-04-05 Wed 19:27>
+
+* 3. tsserver stable verstion is broken. (switched to unstable version)
+<2023-04-17 Mon 02:06>

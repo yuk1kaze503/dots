@@ -64,8 +64,9 @@
       inoremap <silent><expr> <TAB>
       \ coc#pum#visible() ? coc#pum#next(1) :
       \ CheckBackspace() ? "\<Tab>" :
-      \ coc#refresh()           
-    '';
+      \ coc#refresh()
+
+   '';
     plugins = with pkgs.vimPlugins; [
       context-vim
       editorconfig-vim

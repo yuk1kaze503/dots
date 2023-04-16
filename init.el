@@ -154,6 +154,9 @@
   :config
   (smartparens-global-mode))
 
+(use-package cl-libify
+  :ensure t)
+
 ;; Ido mode
 (setq indo-enable-flex-matching t)
 (setq ido-everywhere t)
@@ -220,7 +223,7 @@
   :defer t
   :init (add-hook 'after-init-hook 'global-company-mode)
   :config
-  (setq company-idle-delay 0.2
+  (setq company-idle-delay 0.0
 	company-minimum-prefix-length 1
 	company-selection-wrap-around t
 	company-show-numbers t
@@ -253,13 +256,19 @@
   (add-to-list 'eglot-server-programs '(c++-mode . ("clangd")))
   (add-to-list 'eglot-server-programs '(go-mode . ("gopls")))
   (add-to-list 'eglot-server-programs '(rust-mode . ("rust-analyzer")))
-  (add-to-list 'eglot-server-programs '(python-mode . ("pyls")))
+  (add-to-list 'eglot-server-programs '(python-mode . ("pylsp"))) ;; python-lsp-server
+  (add-to-list 'eglot-server-programs '(kotlin-mode . ("kotlin-language-server")))
+  (add-to-list 'eglot-server-programs '(java-mode . ("java-language-server")))
+  (add-to-list 'eglot-server-programs '(typescript-mode . ("typescript-language-server" "--stdio")))
   (add-hook 'eglot--managed-mode-hook (lambda() (flymake-mode -1)))
   (add-hook 'c-mode-hook 'eglot-ensure)
   (add-hook 'c++-mode-hook 'eglot-ensure)
   (add-hook 'go-mode-hook 'eglot-ensure)
   (add-hook 'rust-mode-hook 'eglot-ensure)
   (add-hook 'python-mode-hook 'eglot-ensure)
+  (add-hook 'java-mode-hook 'eglot-ensure)
+  (add-hook 'kotlin-mode-hook 'eglot-ensure)
+  (add-hook 'typescript-mode-hook 'eglot-ensure)
   ;; format on save
   ;; (add-hook 'c-mode-hook '(lambda() (add-hook 'before-save-hook 'eglot-format-buffer nil t)))
   ;; (add-hook 'c++-mode-hook '(lambda() (add-hook 'before-save-hook 'eglot-format-buffer nil t)))
@@ -267,6 +276,22 @@
   (define-key eglot-mode-map (kbd "C-c r") 'eglot-rename)
   (define-key eglot-mode-map (kbd "C-c f") 'eglot-format))
 
+;; ;; lsp-mode
+;; (use-package lsp-mode
+;;   :ensure t
+;;   :hook (python-mode . lsp-deferred)
+;;   (rust-mode . lsp-deferred)
+;;   (c-mode . lsp-deferred)
+;;   (c++-mode . lsp-deferred)
+;;   :commands (lsp lsp-deferred))
+
+;; (use-package lsp-ui
+;;   :ensure t
+;;   :after lsp)
+
+;; (use-package lsp-ivy
+;;   :ensure t
+;;   :after lsp)
 
 ;; go-mode
 (use-package go-mode
@@ -296,7 +321,9 @@
   ;; (setq-default rustic-format-trigger 'on-save)
   )
 
-
+;; python
+(use-package python-mode
+  :ensure t)
 (use-package python-black
   :demand t
   :after python
@@ -305,21 +332,12 @@
 
 ;; typescript-mode
 (use-package typescript-mode
-  :ensure t
-  :defer t
-  :mode (("\\.ts\\'" . typescript-mode)))
+  :ensure t)
+  
 
-(use-package tide
-  :ensure t
-  :defer t
-  :config
-  (add-hook 'typescript-mode-hook
-	    (lambda ()
-	      (tide-setup)
-	      (flycheck-mode t)
-	      (setq flycheck-check-syntax-automatically '(save mode-enabled))
-	      (eldoc-mode t)
-	      (company-mode-on))))
+;; kotlin things
+(use-package kotlin-mode
+  :ensure t)
 
 ;; geiser
 (use-package geiser-guile
@@ -386,7 +404,7 @@
  '(custom-safe-themes
    '("adaf421037f4ae6725aa9f5654a2ed49e2cd2765f71e19a7d26a454491b486eb" "1b8d67b43ff1723960eb5e0cba512a2c7a2ad544ddb2533a90101fd1852b426e" "bb08c73af94ee74453c90422485b29e5643b73b05e8de029a6909af6a3fb3f58" "72ed8b6bffe0bfa8d097810649fd57d2b598deef47c992920aef8b5d9599eefe" "628278136f88aa1a151bb2d6c8a86bf2b7631fbea5f0f76cba2a0079cd910f7d" default))
  '(package-selected-packages
-   '(doom-themes magit sanityinc-tomorrow-day solarized-theme material-theme color-theme-sanityinc-tomorrow key-chord organic-green-theme undo-tree everforest-theme everforest powerline-evil powerline evil vterm cl clang-format monokai-pro-theme nix-mode darkokai-theme darkokai gruvbox-theme yasnippet-snippets yasnippet tide typescript-mode all-the-icons-dired all-the-icons-ibuffer gcmh move-text zenburn-theme darcula-theme darcula zenburn exec-path-from-shell company-box python-black go-mode dracula-theme which-key try use-package)))
+   '(cl-libify lsp-ivy lsp-ui lsp-mode eglot-java kotlin-mode python-mode doom-themes magit sanityinc-tomorrow-day solarized-theme material-theme color-theme-sanityinc-tomorrow key-chord organic-green-theme undo-tree everforest-theme everforest powerline-evil powerline evil vterm cl clang-format monokai-pro-theme nix-mode darkokai-theme darkokai gruvbox-theme yasnippet-snippets yasnippet tide typescript-mode all-the-icons-dired all-the-icons-ibuffer gcmh move-text zenburn-theme darcula-theme darcula zenburn exec-path-from-shell company-box python-black go-mode dracula-theme which-key try use-package)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
