@@ -109,7 +109,7 @@
   :config (which-key-mode))
 
 (use-package undo-tree
-  :ensure)
+  :ensure t)
 
 (add-to-list 'custom-theme-load-path "~/.emacs.d/everforest")
 (load-theme 'everforest-hard-dark t)
@@ -174,23 +174,66 @@
 			    (setq tab-width 8)
 			    (setq standard-indent 8)
 			    (setq ident-tabs-mode nil)))
+;; auto-sudoedit
+(use-package auto-sudoedit
+  :ensure t
+  :config
+  (auto-sudoedit-mode 1))
 
 ;; terminal-emulator
 ;; installed vterm-module in home.nix
 (use-package vterm
   :ensure t)
 
-;; ;; evil-mode
-;; (use-package evil
-;;   :ensure t
-;;   :config (evil-mode 1))
+;; evil-mode
+(use-package evil
+  :ensure t
+  :config (evil-mode 1))
 
-;; (use-package key-chord
-;;   :ensure t
-;;   :config (setq key-chord-two-keys-delay 0.5)
-;;   (key-chord-define evil-insert-state-map "jj" 'evil-normal-state)
-;;   (key-chord-mode 1))
+(use-package key-chord
+  :ensure t
+  :config (setq key-chord-two-keys-delay 0.5)
+  (key-chord-define evil-insert-state-map "jj" 'evil-normal-state)
+  (key-chord-mode 1))
 
+;; smart-mode-line
+(use-package smart-mode-line
+  :ensure t
+  :config
+  (setq sml/no-confirm-load-theme t)
+  (setq sml/theme 'dark)
+  (sml/setup))
+
+;; Utilities
+(use-package s
+  :ensure t
+  :defer t)
+
+(use-package dash
+  :ensure t
+  :defer t)
+
+(use-package visual-fill-column
+  :ensure t
+  :defer t)
+
+(use-package rainbow-mode
+  :ensure t
+  :commands rainbow-mode)
+
+(use-package exec-path-from-shell
+  :ensure t
+  :defer t
+  :config
+  (when (memq window-system '(mac ns))
+    progn ((exec-path-from-shell-initialize)
+	    (setq mac-command-modifier 'meta))))
+
+;; smart-jump
+(use-package smart-jump
+  :ensure t
+  :config
+  (smart-jump-setup-default-registers))
 
 ;; clang-format
 (use-package clang-format
@@ -247,6 +290,10 @@
 						 :select (:background "purple" :foreground "white")))
   (add-to-list 'company-box-frame-parameters '(font . "Iosevka-14")))
 
+;; counsel
+(use-package counsel
+  :ensure t
+  :defer t)
 
 ;; eglot lsp
 (use-package eglot
@@ -276,22 +323,6 @@
   (define-key eglot-mode-map (kbd "C-c r") 'eglot-rename)
   (define-key eglot-mode-map (kbd "C-c f") 'eglot-format))
 
-;; ;; lsp-mode
-;; (use-package lsp-mode
-;;   :ensure t
-;;   :hook (python-mode . lsp-deferred)
-;;   (rust-mode . lsp-deferred)
-;;   (c-mode . lsp-deferred)
-;;   (c++-mode . lsp-deferred)
-;;   :commands (lsp lsp-deferred))
-
-;; (use-package lsp-ui
-;;   :ensure t
-;;   :after lsp)
-
-;; (use-package lsp-ivy
-;;   :ensure t
-;;   :after lsp)
 
 ;; go-mode
 (use-package go-mode
@@ -322,8 +353,11 @@
   )
 
 ;; python
-(use-package python-mode
-  :ensure t)
+(use-package elpy
+  :ensure t
+  :mode "\\.py\\'"
+  :config (elpy-enable))
+
 (use-package python-black
   :demand t
   :after python
@@ -402,9 +436,9 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(custom-safe-themes
-   '("adaf421037f4ae6725aa9f5654a2ed49e2cd2765f71e19a7d26a454491b486eb" "1b8d67b43ff1723960eb5e0cba512a2c7a2ad544ddb2533a90101fd1852b426e" "bb08c73af94ee74453c90422485b29e5643b73b05e8de029a6909af6a3fb3f58" "72ed8b6bffe0bfa8d097810649fd57d2b598deef47c992920aef8b5d9599eefe" "628278136f88aa1a151bb2d6c8a86bf2b7631fbea5f0f76cba2a0079cd910f7d" default))
+   '("3c83b3676d796422704082049fc38b6966bcad960f896669dfc21a7a37a748fa" "4b287bfbd581ea819e5d7abe139db1fb5ba71ab945cec438c48722bea3ed6689" "adaf421037f4ae6725aa9f5654a2ed49e2cd2765f71e19a7d26a454491b486eb" "1b8d67b43ff1723960eb5e0cba512a2c7a2ad544ddb2533a90101fd1852b426e" "bb08c73af94ee74453c90422485b29e5643b73b05e8de029a6909af6a3fb3f58" "72ed8b6bffe0bfa8d097810649fd57d2b598deef47c992920aef8b5d9599eefe" "628278136f88aa1a151bb2d6c8a86bf2b7631fbea5f0f76cba2a0079cd910f7d" default))
  '(package-selected-packages
-   '(cl-libify lsp-ivy lsp-ui lsp-mode eglot-java kotlin-mode python-mode doom-themes magit sanityinc-tomorrow-day solarized-theme material-theme color-theme-sanityinc-tomorrow key-chord organic-green-theme undo-tree everforest-theme everforest powerline-evil powerline evil vterm cl clang-format monokai-pro-theme nix-mode darkokai-theme darkokai gruvbox-theme yasnippet-snippets yasnippet tide typescript-mode all-the-icons-dired all-the-icons-ibuffer gcmh move-text zenburn-theme darcula-theme darcula zenburn exec-path-from-shell company-box python-black go-mode dracula-theme which-key try use-package)))
+   '(exec-path-frome-shell counsel rainbow-mode visual-fill-column virtual-fill-column elpy smart-mode-line-atom-one-dark-theme smart-mode-line smart-jump auto-sudoedit cl-libify lsp-ivy lsp-ui lsp-mode eglot-java kotlin-mode python-mode doom-themes magit sanityinc-tomorrow-day solarized-theme material-theme color-theme-sanityinc-tomorrow key-chord organic-green-theme undo-tree everforest-theme everforest powerline-evil powerline evil vterm cl clang-format monokai-pro-theme nix-mode darkokai-theme darkokai gruvbox-theme yasnippet-snippets yasnippet tide typescript-mode all-the-icons-dired all-the-icons-ibuffer gcmh move-text zenburn-theme darcula-theme darcula zenburn exec-path-from-shell company-box python-black go-mode dracula-theme which-key try use-package)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
