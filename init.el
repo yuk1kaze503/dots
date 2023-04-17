@@ -152,7 +152,8 @@
 (use-package smartparens
   :ensure t
   :config
-  (smartparens-global-mode))
+  (sp-pair "'" nil :actions nil)
+  (smartparens-global-mode t))
 
 (use-package cl-libify
   :ensure t)
@@ -355,7 +356,6 @@
 ;; python
 (use-package elpy
   :ensure t
-  :mode "\\.py\\'"
   :config (elpy-enable))
 
 (use-package python-black
