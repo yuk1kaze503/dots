@@ -43,7 +43,7 @@ in
 
   # VM
   virtualisation.docker.enable = true;
-  
+
   # Select internationalisation properties.
   i18n = {
     defaultLocale = "en_US.UTF-8";
@@ -129,7 +129,7 @@ in
   users.users.sn0w = {
     isNormalUser = true;
     description = "sn0w";
-    extraGroups = [ "networkmanager" "wheel" "docker" ];
+    extraGroups = [ "networkmanager" "wheel" "docker" "vboxusers"];
     shell = pkgs.zsh;
     packages = with pkgs; [
       kate
@@ -159,6 +159,7 @@ in
       set -g mouse on
     '';
   };
+
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
 
@@ -215,7 +216,6 @@ in
     unstable.nodejs
     unstable.nodePackages.npm
     unstable.nodePackages.typescript
-    unstable.nodePackages.typescript-language-server
     rustup
     ocaml
     go
@@ -225,10 +225,10 @@ in
     python310Packages.python-lsp-server
     kotlin-language-server
     java-language-server
+    unstable.nodePackages.typescript-language-server
     # vm
     docker
     qemu
-    virtualbox
     # net-things
     openssl
     openvpn
@@ -253,8 +253,8 @@ in
   };  
 
   # system environment
-  #services.accounts-daemon.enable = true;
-  #services.gnome.gnome-online-accounts.enable = true;
+  services.accounts-daemon.enable = true;
+  services.gnome.gnome-online-accounts.enable = true;
   #environment.variables = {
   #  WEBKIT_FORCE_SANDBOX = "0";
   #};
