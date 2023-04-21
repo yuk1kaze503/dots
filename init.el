@@ -419,9 +419,16 @@
   :hook (python-mode . python-black-on-save-mode-enable-dwim))
 
 
-;; typescript-mode
+;; typescript
 (use-package typescript-mode
   :ensure t)
+
+(use-package tide
+  :ensure t
+  :after typescript-mode
+  :hook ((typescript-mode . tide-setup)
+	 (typescript-mode . tide-hl-identifier-mode)
+	 (before-save . tide-format-before-save)))
   
 
 ;; kotlin things
@@ -470,11 +477,16 @@
   :ensure t)
 
 ;; dired
+(use-package dired
+  :ensure nil
+  :commands (dired dired-jump)
+  :config
   (setq dired-dwim-target t)
   (setq delete-by-moving-to-trash t)
   (setq dired-guess-shell-alist-user `(("\\.png\\'" "gimp")
                                        ("\\.jpe?g\\'" "gimp")
                                        ("\\.mp4\\'" "mpv")))
+  (add-hook 'dired-load-hook (lambda () (load "dired-x"))))
 
 (use-package yasnippet
   :ensure t
