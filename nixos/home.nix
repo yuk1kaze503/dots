@@ -19,6 +19,11 @@
   # Let Home Manager install and manage itself.
   programs.home-manager.enable = true;
   
+  # Allow Unfree
+  nixpkgs.config = {
+    allowUnfree = true;
+  };
+
   home.packages = with pkgs; [
     okular
     p7zip
@@ -26,6 +31,7 @@
     stdman
     emacsPackages.vterm
     thunderbird
+    gimp
     tree
     libsForQt5.kdeconnect-kde
     libsForQt5.yakuake
@@ -33,6 +39,8 @@
     nordic                      
     ruby
     rbenv
+    tdesktop
+    discord
   ];
 
   programs.neovim = {
