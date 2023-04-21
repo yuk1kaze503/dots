@@ -117,10 +117,9 @@
   (global-undo-tree-mode 1))
 
 ;; ;; everforest theme
-(add-to-list 'custom-theme-load-path "~/.emacs.d/everforest")
-(load-theme 'everforest-hard-dark t)
-;;(set-frame-font "Sarasa Mono J-18")
-(set-frame-font "JetBrains Mono-18")
+;; (add-to-list 'custom-theme-load-path "~/.emacs.d/everforest")
+;; (load-theme 'everforest-hard-dark t)
+(set-frame-font "Sarasa Mono J-20")
 
 (use-package arjen-grey-theme
   :ensure t
@@ -134,7 +133,7 @@
 
 (use-package color-theme-sanityinc-tomorrow
   :ensure t
-  :config ;(load-theme 'sanityinc-tomorrow-day t)
+  :config (load-theme 'sanityinc-tomorrow-day t)
   )
 
 (use-package doom-themes
@@ -208,26 +207,18 @@
 
 ;; ;; evil-mode  ;; trying agian 2023-04-19 11:43:16
                  ;; failed. 2023-04-21 09:00:34
-;; (use-package evil
-;;   :ensure t
-;;   :config (evil-mode 1))
-
-;; (use-package key-chord
-;;   :ensure t
-;;   :config (setq key-chord-two-keys-delay 0.5)
-;;   (key-chord-define evil-insert-state-map "jj" 'evil-normal-state)
-;;   (key-chord-mode 1))
 
 ;; smart-mode-line
+(use-package smart-mode-line-atom-one-dark-theme
+  :ensure t)
 (use-package smart-mode-line
   :ensure t
   :config
   (setq sml/no-confirm-load-theme t)
-  (setq sml/theme 'atom-one-dark)
+  ;(setq sml/theme 'atom-one-dark)
+  (setq sml/thme 'light)
   (sml/setup))
 
-(use-package smart-mode-line-atom-one-dark-theme
-  :ensure t)
 
 ;; Utilities
 (use-package s
