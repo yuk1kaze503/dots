@@ -271,8 +271,10 @@
   :defer t
   :config
   (when (memq window-system '(mac ns))
-    progn ((exec-path-from-shell-initialize)
-	    (setq mac-command-modifier 'meta))))
+    (exec-path-from-shell-initialize)))
+;; for mac
+(when (memq window-system '(mac ns))
+	    (setq mac-command-modifier 'meta))
 
 ;; smart-jump
 (use-package smart-jump
