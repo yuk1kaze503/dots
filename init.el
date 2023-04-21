@@ -109,11 +109,22 @@
   :config (which-key-mode))
 
 (use-package undo-tree
-  :ensure t)
+  :ensure t
+  :config
+  (setq undo-tree-visualizer-diff t)
+  (setq undo-tree-visualizer-timestamps t)
+  (setq undo-tree-auto-save-history nil)
+  (global-undo-tree-mode 1))
 
-(add-to-list 'custom-theme-load-path "~/.emacs.d/everforest")
-(load-theme 'everforest-hard-dark t)
-(set-frame-font "Sarasa Mono J-18")
+;; ;; everforest theme
+;; (add-to-list 'custom-theme-load-path "~/.emacs.d/everforest")
+;; (load-theme 'everforest-hard-dark t)
+;;(set-frame-font "Sarasa Mono J-18")
+(set-frame-font "JetBrains Mono-18")
+
+(use-package arjen-grey-theme
+  :ensure t
+  :config (load-theme 'arjen-grey t))
 
 (use-package material-theme
   :ensure t
@@ -168,6 +179,11 @@
   :ensure t
   :config (global-set-key (kbd "C-x g") 'magit-status))
 
+(use-package magit-gitflow
+  :ensure t
+  :config
+  (add-hook 'magit-mode-hook 'turn-on-magit-gitflow))
+
 (setq-default c-basic-offset kang/indent-width)
 ;; c-mode-hook
 (add-hook 'c-mode-hook (lambda()
@@ -186,7 +202,8 @@
 (use-package vterm
   :ensure t)
 
-;; evil-mode
+;; ;; evil-mode  ;; trying agian 2023-04-19 11:43:16
+                 ;; failed. 2023-04-21 09:00:34
 ;; (use-package evil
 ;;   :ensure t
 ;;   :config (evil-mode 1))
@@ -202,8 +219,11 @@
   :ensure t
   :config
   (setq sml/no-confirm-load-theme t)
-  (setq sml/theme 'dark)
+  (setq sml/theme 'atom-one-dark)
   (sml/setup))
+
+(use-package smart-mode-line-atom-one-dark-theme
+  :ensure t)
 
 ;; Utilities
 (use-package s
@@ -218,9 +238,33 @@
   :ensure t
   :defer t)
 
-(use-package rainbow-mode
-  :ensure t
-  :commands rainbow-mode)
+(use-package hl-todo
+  :diminish hl-todo
+  :config
+  (setq hl-todo-highlight-punctuation ":"
+        hl-todo-keyword-faces
+        `(("TODO"       warning bold)
+          ("FIXME"      error bold)
+          ("HACK"       font-lock-constant-face bold)
+          ("REVIEW"     font-lock-keyword-face bold)
+          ("NOTE"       success bold)
+          ("DEPRECATED" font-lock-doc-face bold)))
+  (add-hook 'prog-mode-hook #'hl-todo-mode))
+
+(use-package rainbow-delimiters
+  :config
+  (add-hook 'prog-mode-hook
+            (lambda()
+              (rainbow-delimiters-mode)
+              )))
+(require 'cl-lib)
+(require 'color)
+(cl-loop
+ for index from 1 to rainbow-delimiters-max-face-count
+ do
+ (let ((face (intern (format "rainbow-delimiters-depth-%d-face" index))))
+   (cl-callf color-saturate-name (face-foreground face) 30)))
+
 
 (use-package exec-path-from-shell
   :ensure t
@@ -421,14 +465,13 @@
   :commands dired-jump)
 
 
-;; (use-package yasnippet
-;;   :ensure t
-;;   :init (yas-global-mode 1))
+(use-package yasnippet
+  :ensure t
+  :init (yas-global-mode 1))
 
-;; (use-package yasnippet-snippets
-;;   :defer t
-;;   :after yasnippet)
-
+(use-package yasnippet-snippets
+  :defer t
+  :after yasnippet)
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
@@ -438,7 +481,7 @@
  '(custom-safe-themes
    '("3c83b3676d796422704082049fc38b6966bcad960f896669dfc21a7a37a748fa" "4b287bfbd581ea819e5d7abe139db1fb5ba71ab945cec438c48722bea3ed6689" "adaf421037f4ae6725aa9f5654a2ed49e2cd2765f71e19a7d26a454491b486eb" "1b8d67b43ff1723960eb5e0cba512a2c7a2ad544ddb2533a90101fd1852b426e" "bb08c73af94ee74453c90422485b29e5643b73b05e8de029a6909af6a3fb3f58" "72ed8b6bffe0bfa8d097810649fd57d2b598deef47c992920aef8b5d9599eefe" "628278136f88aa1a151bb2d6c8a86bf2b7631fbea5f0f76cba2a0079cd910f7d" default))
  '(package-selected-packages
-   '(exec-path-frome-shell counsel rainbow-mode visual-fill-column virtual-fill-column elpy smart-mode-line-atom-one-dark-theme smart-mode-line smart-jump auto-sudoedit cl-libify lsp-ivy lsp-ui lsp-mode eglot-java kotlin-mode python-mode doom-themes magit sanityinc-tomorrow-day solarized-theme material-theme color-theme-sanityinc-tomorrow key-chord organic-green-theme undo-tree everforest-theme everforest powerline-evil powerline evil vterm cl clang-format monokai-pro-theme nix-mode darkokai-theme darkokai gruvbox-theme yasnippet-snippets yasnippet tide typescript-mode all-the-icons-dired all-the-icons-ibuffer gcmh move-text zenburn-theme darcula-theme darcula zenburn exec-path-from-shell company-box python-black go-mode dracula-theme which-key try use-package)))
+   '(rainbow-delimiters hl-todo magit-gitflow arjen-grey-theme exec-path-frome-shell counsel rainbow-mode visual-fill-column virtual-fill-column elpy smart-mode-line-atom-one-dark-theme smart-mode-line smart-jump auto-sudoedit cl-libify lsp-ivy lsp-ui lsp-mode eglot-java kotlin-mode python-mode doom-themes magit sanityinc-tomorrow-day solarized-theme material-theme color-theme-sanityinc-tomorrow key-chord organic-green-theme undo-tree everforest-theme everforest powerline-evil powerline evil vterm cl clang-format monokai-pro-theme nix-mode darkokai-theme darkokai gruvbox-theme yasnippet-snippets yasnippet tide typescript-mode all-the-icons-dired all-the-icons-ibuffer gcmh move-text zenburn-theme darcula-theme darcula zenburn exec-path-from-shell company-box python-black go-mode dracula-theme which-key try use-package)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
