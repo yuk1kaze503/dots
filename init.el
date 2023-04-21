@@ -478,7 +478,27 @@
   (all-the-icons-ibuffer-mode 1))
 (use-package ibuffer
   :config
-  (setq ibuffer-default-sorting-mode 'major-mode))
+					; (setq ibuffer-default-sorting-mode 'major-mode)
+  (setq ibuffer-expert t)
+  (setq ibuffer-display-summary nil)
+  (setq ibuffer-use-header-line t)
+  (setq ibuffer-default-shrink-to-minimum-size nil)
+  (setq ibuffer-default-sorting-mode 'filename/process)
+  (setq ibuffer-formats
+	'((mark modified read-only locked " "
+		(name 30 30 :left :elide)
+		" "
+		(size 9 -1 :right)
+		" "
+		(mode 16 16 :left :elide)
+		" " filename-and-process)
+	  (mark " "
+		(name 16 -1)
+		" " filename)))
+  :hook
+  (ibuffer-mode . hl-line-mode)
+  :bind
+  ("C-x C-b" . ibuffer))
 
 
 ;; all the icons
