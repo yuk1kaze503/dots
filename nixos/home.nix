@@ -27,6 +27,8 @@
   home.packages = with pkgs; [
     okular
     p7zip
+    xclip
+    xsel
     gnomeExtensions.hide-top-bar
     stdman
     emacsPackages.vterm

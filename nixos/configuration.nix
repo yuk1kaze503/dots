@@ -142,8 +142,8 @@ in
   programs.zsh.autosuggestions.enable = true;
   programs.zsh.ohMyZsh = {
     enable = true;
-    plugins = [ "git" "man" "thefuck"];
-    theme = "lambda";
+    plugins = [ "git" "man" "thefuck" "copybuffer" "copypath" ];
+    theme = "candy";
   };
   # tmux
   programs.tmux = {

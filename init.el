@@ -62,9 +62,9 @@
 ;; display line number
 (progn
   (global-display-line-numbers-mode)
-  (setq display-line-numbers-type 'relative)
-  (set-face-attribute 'line-number-current-line nil
-		      :foreground "gold"))
+  (setq display-line-numbers-type 'relative))
+   ;; (set-face-attribute 'line-number-current-line nil
+   ;; 		      :foreground "gold")
 (setq column-number-mode t)
 
 (defvar kang/indent-width 2)
@@ -134,7 +134,8 @@
 (use-package color-theme-sanityinc-tomorrow
   :ensure t
   :config (load-theme 'sanityinc-tomorrow-day t)
-  )
+  (set-face-attribute 'line-number-current-line nil
+		      :foreground "purple"))
 
 (use-package doom-themes
   :ensure t
