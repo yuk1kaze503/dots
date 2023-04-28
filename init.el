@@ -164,7 +164,9 @@
 (use-package smartparens
   :ensure t
   :config
-  (sp-pair "'" nil :actions nil)
+					;(sp-pair "'" nil :actions nil)
+  (sp-with-modes 'rust-mode
+    (sp-local-pair "'" nil :actions nil))
   (smartparens-global-mode t))
 
 (use-package cl-libify
@@ -408,7 +410,9 @@
   :ensure t
   :config
   (elpy-enable)
-  (setq python-indent 4))
+  (setq python-indent 4)
+  (setq python-shell-interpreter "ipython"
+	python-shell-interpreter-args "-i --simple-prompt"))
 
 (use-package python-black
   :demand t
