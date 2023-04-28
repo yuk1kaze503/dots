@@ -164,7 +164,6 @@
 (use-package smartparens
   :ensure t
   :config
-					;(sp-pair "'" nil :actions nil)
   (sp-with-modes 'rust-mode
     (sp-local-pair "'" nil :actions nil))
   (smartparens-global-mode t))
@@ -514,6 +513,13 @@
                                        ("\\.jpe?g\\'" "gimp")
                                        ("\\.mp4\\'" "mpv")))
   (add-hook 'dired-load-hook (lambda () (load "dired-x"))))
+
+(use-package markdown-mode
+  :ensure t
+  :mode ("README\\.md\\'" . gfm-mode)
+  :init (setq markdown-command "multimarkdown")
+  :bind (:map markdown-mode-map
+         ("C-c C-e" . markdown-do)))
 
 (use-package yasnippet
   :ensure t
