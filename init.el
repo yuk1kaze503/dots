@@ -131,11 +131,22 @@
   :config ;(load-theme 'material-light t)
   )
 
+(use-package catppuccin-theme
+  :ensure t
+  :config
+  (setq catppuccin-flavor 'latte) ;; or 'latte, 'macchiato, or 'mocha
+  (load-theme 'catppuccin t)
+  (set-face-attribute 'line-number-current-line nil
+		      :foreground "purple")
+  )
+
 (use-package color-theme-sanityinc-tomorrow
   :ensure t
-  :config (load-theme 'sanityinc-tomorrow-day t)
-  (set-face-attribute 'line-number-current-line nil
-		      :foreground "purple"))
+  :config
+  ;; (load-theme 'sanityinc-tomorrow-day t)
+  ;; (set-face-attribute 'line-number-current-line nil
+  ;; 		      :foreground "purple")
+  )
 
 (use-package doom-themes
   :ensure t
