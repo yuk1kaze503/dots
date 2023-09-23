@@ -54,7 +54,7 @@
 
 ;; global key-bindings
 (global-set-key (kbd "M-:") 'comment-dwim)
-
+(global-set-key (kbd "<f4>") 'compile)
 
 ;; kill whole line
 (setq kill-whole-line t)
