@@ -119,7 +119,9 @@
 ;; ;; everforest theme
 ;; (add-to-list 'custom-theme-load-path "~/.emacs.d/everforest")
 ;; (load-theme 'everforest-hard-dark t)
-(set-frame-font "Sarasa Mono J-20")
+(add-to-list 'default-frame-alist '(font . "Sarasa Mono J"))
+(set-face-attribute 'default t :font "Sarasa Mono J-20")
+;; (set-frame-font "Sarasa Mono J-20")
 
 (use-package arjen-grey-theme
   :ensure t
@@ -344,7 +346,7 @@
   :config
   (setq company-box-backends-colors '(:candidate "purple" :annotation "#7C4Dff"
 						 :select (:background "purple" :foreground "white")))
-  (add-to-list 'company-box-frame-parameters '(font . "Iosevka-14")))
+  (add-to-list 'company-box-frame-parameters '(font . "Hack-14")))
 
 ;; counsel
 (use-package counsel

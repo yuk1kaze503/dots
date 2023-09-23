@@ -175,7 +175,7 @@ in
   environment.systemPackages = with pkgs; [
     vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
     wget
-    emacs
+    emacs29
     vscode
     # terminal
     gnome.gnome-terminal
@@ -255,8 +255,8 @@ in
   };  
 
   # system environment
-  services.accounts-daemon.enable = true;
-  services.gnome.gnome-online-accounts.enable = true;
+  #services.accounts-daemon.enable = true;
+  #services.gnome.gnome-online-accounts.enable = true;
   #environment.variables = {
   #  WEBKIT_FORCE_SANDBOX = "0";
   #};
