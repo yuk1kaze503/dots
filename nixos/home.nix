@@ -1,6 +1,8 @@
 { config, pkgs, ... }:
-
-{
+let 
+  unstable = import<nixos-unstable> {};
+in
+  {
   # Home Manager needs a bit of information about you and the
   # paths it should manage.
   home.username = "sn0w";
@@ -14,7 +16,7 @@
   # You can update Home Manager without changing this value. See
   # the Home Manager release notes for a list of state version
   # changes in each release.
-  home.stateVersion = "22.11";
+  home.stateVersion = "23.05";
 
   # Let Home Manager install and manage itself.
   programs.home-manager.enable = true;
@@ -26,6 +28,7 @@
 
   home.packages = with pkgs; [
     okular
+    steam
     p7zip
     xclip
     xsel
@@ -35,18 +38,20 @@
     thunderbird
     gimp
     tree
-    libsForQt5.kdeconnect-kde
-    libsForQt5.yakuake
-    libsForQt5.fcitx5-qt
     nordic                      
     ruby
     rbenv
     tdesktop
     discord
+    unstable.jdt-language-server
+    emacsPackages.yasnippet-snippets
   ];
 
   programs.neovim = {
     enable = true;
+    defaultEditor = true;
+    #viAlias = true;
+    #vimAlias = true;
     extraConfig = '' 
       set background=dark
       colorscheme everforest
