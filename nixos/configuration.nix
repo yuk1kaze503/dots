@@ -162,6 +162,11 @@ in
     '';
   };
 
+  # emacs daemon
+  services.emacs = {
+    enable = true;
+    package = pkgs.emacs29;
+  };
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
 
@@ -173,10 +178,9 @@ in
   # List packages installed in system profile. To search, run:
   # $ nix search wget
   environment.systemPackages = with pkgs; [
-    vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
+    # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
     wget
-    emacs29
-    vscode
+    #unstable.vscode # allowUnfree not working for vscode. 2023-10-01 5AM
     # terminal
     gnome.gnome-terminal
     kitty
@@ -222,7 +226,7 @@ in
     ocaml
     go
     # lsp
-    rust-analyzer
+    unstable.rust-analyzer
     gopls
     python310Packages.python-lsp-server
     kotlin-language-server
@@ -255,8 +259,8 @@ in
   };  
 
   # system environment
-  #services.accounts-daemon.enable = true;
-  #services.gnome.gnome-online-accounts.enable = true;
+  services.accounts-daemon.enable = true;
+  services.gnome.gnome-online-accounts.enable = true;
   #environment.variables = {
   #  WEBKIT_FORCE_SANDBOX = "0";
   #};

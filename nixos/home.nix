@@ -27,6 +27,7 @@ in
   };
 
   home.packages = with pkgs; [
+    unstable.vscode
     okular
     steam
     p7zip
