@@ -4,3 +4,25 @@
 
 * 3. tsserver stable verstion is broken. (switched to unstable version)
 <2023-04-17 Mon 02:06>
+
+* 4. commands
+** search package:
+#+begin_src nix
+  nix-env -qa <name>
+#+end_src
+** install & uninstall
+#+begin_src nix
+  nix-env --install <name>
+  nix-env --uninstall <name>
+#+end_src
+** list generations, rollback, switch-generations
+#+begin_src nix
+  nix-env --list-generations
+  nix-env --rollback
+  nix-env --switch-generation <no>
+#+end_src
+** gc
+#+begin_src nix
+  nix-store --gc
+  nix-collect-garbage
+#+end_src
