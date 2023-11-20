@@ -4,9 +4,6 @@
 
 { config, pkgs, ... }:
 
-let 
-  unstable = import <nixos-unstable> {};
-in
 {
   imports =
     [ # Include the results of the hardware scan.
@@ -14,20 +11,30 @@ in
     ];
 
   # Bootloader.
+  #boot.loader.systemd-boot.enable = true;
+  #boot.loader.efi.canTouchEfiVariables = true;
   boot.loader = {
     efi.canTouchEfiVariables = true;
-    efi.efiSysMountPoint = "/boot/efi";
+    efi.efiSysMountPoint = "/boot";
     grub = {
       enable = true;
-      devices = [ "nodev" ];
+      devices = ["nodev"];
       efiSupport = true;
-      useOSProber = true;
+      # useOSProber = true;
+      extraEntries = ''
+        menuentry "Windows" {
+          insmod part_gpt
+          insmod fat
+          insmod search_fs_uuid
+          insmod chain
+          search --fs-uuid --set=root 7C06-AAD2
+          chainloader /EFI/Microsoft/Boot/bootmgfw.efi
+        }
+      '';
     };
   };
- 
+
   time.hardwareClockInLocalTime = true;
-  
-  
   networking.hostName = "n1x0s"; # Define your hostname.
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
 
@@ -41,14 +48,11 @@ in
   # Set your time zone.
   time.timeZone = "Asia/Tokyo";
 
-  # VM
-  virtualisation.docker.enable = true;
-
   # Select internationalisation properties.
-  i18n = {
+  i18n= {
     defaultLocale = "en_US.UTF-8";
     supportedLocales = ["en_US.UTF-8/UTF-8" "zh_CN.UTF-8/UTF-8" "ja_JP.UTF-8/UTF-8" ];
-  };
+  };  
 
   i18n.extraLocaleSettings = {
     LC_ADDRESS = "en_US.UTF-8";
@@ -61,17 +65,14 @@ in
     LC_TELEPHONE = "en_US.UTF-8";
     LC_TIME = "en_US.UTF-8";
   };
-
+  
   i18n.inputMethod = { 
-    #enabled = "fcitx5";
-    #fcitx5.addons = with pkgs;
-    #[ fcitx5-mozc fcitx5-hangul fcitx5-rime fcitx5-chinese-addons ];
-    enabled = "ibus";
-    ibus.engines = with pkgs.ibus-engines;
-    [ mozc hangul rime];
+    enabled = "fcitx5";
+    fcitx5.addons = with pkgs;
+    [ fcitx5-mozc fcitx5-hangul fcitx5-rime fcitx5-gtk ];
   };
 
-  # fonts
+ # Fonts
   fonts.fonts = with pkgs; [
   unicode-emoji
   emojione
@@ -85,16 +86,13 @@ in
   noto-fonts-cjk-sans
   noto-fonts-cjk-serif
   ];
+
   # Enable the X11 windowing system.
   services.xserver.enable = true;
 
-  # Enable the KDE Plasma Desktop Environment.
-  #services.xserver.displayManager.sddm.enable = true;
-  #services.xserver.desktopManager.plasma5.enable = true;
-  #
-  # Gnome
-  services.xserver.displayManager.gdm.enable = true;
-  services.xserver.desktopManager.gnome.enable = true;
+  # Enable the Cinnamon Desktop Environment.
+  services.xserver.displayManager.lightdm.enable = true;
+  services.xserver.desktopManager.cinnamon.enable = true;
 
   # Configure keymap in X11
   services.xserver = {
@@ -126,144 +124,64 @@ in
   # services.xserver.libinput.enable = true;
 
   # Define a user account. Don't forget to set a password with ‘passwd’.
-  users.users.sn0w = {
+  users.users.snow = {
     isNormalUser = true;
-    description = "sn0w";
-    extraGroups = [ "networkmanager" "wheel" "docker" "vboxusers"];
-    shell = pkgs.zsh;
+    description = "snowrain";
+    extraGroups = [ "networkmanager" "wheel" "docker"];
     packages = with pkgs; [
-      kate
+      firefox
+      emacs29
+      neofetch
+      lolcat
     #  thunderbird
     ];
   };
-  # ZSH
-  programs.zsh.enable = true;
-  programs.zsh.syntaxHighlighting.enable = true;
-  programs.zsh.autosuggestions.enable = true;
-  programs.zsh.ohMyZsh = {
-    enable = true;
-    plugins = [ "git" "man" "thefuck" "copybuffer" "copypath" ];
-    theme = "candy";
-  };
-  # tmux
-  programs.tmux = {
-    enable = true;
-    clock24 = true;
-    extraConfig = ''
-      set-option -sa terminal-overrides ",xterm*:Tc"
-      set-option -g renumber-windows on
-      unbind C-b
-      set -g prefix C-x
-      bind C-x send-prefix
-      set -g mode-keys emacs
-      set -g status-keys emacs
-      set -s escape-time 0
-      set -g mouse on
-    '';
+
+  #vm
+  virtualisation = {
+    docker.enable = true;
   };
 
-  # emacs daemon
-  services.emacs = {
-    enable = true;
-    package = pkgs.emacs29;
-  };
+  users.groups.docker.members = [ "snow" ];
+
+  
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
-
+  #nixpkgs.config.allowUnfreePredicate = _: true;
+  
   # Nvidia driver
   services.xserver.videoDrivers = ["nvidia"];
   hardware.opengl.enable = true;
-  hardware.nvidia.package = config.boot.kernelPackages.nvidiaPackages.stable;
+  hardware.nvidia = { 
+    modesetting.enable = true;
+    open = false;
+    nvidiaSettings = true;
+    package = config.boot.kernelPackages.nvidiaPackages.legacy_390;
+  };
 
   # List packages installed in system profile. To search, run:
   # $ nix search wget
   environment.systemPackages = with pkgs; [
-    # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
-    wget
-    #unstable.vscode # allowUnfree not working for vscode. 2023-10-01 5AM
-    # terminal
-    gnome.gnome-terminal
-    kitty
-    # utilities
-    wget
-    curl
-    git
-    zsh
-    tmux
-    unzip
-    unrar
-    ranger
-    htop
-    zsh
-    thefuck
-    bat
-    neofetch
-    trash-cli
-    #webkitgtk
-    #glib
-    # web browser
-    firefox
-    google-chrome
-    # dev
+  #  vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
+  #  wget
+    vim
     llvmPackages_15.llvm
     clang_15
-    clang-tools_15   
+    clang-tools_15
     gcc
     gdb
     cmake
     libtool
-    libvterm
-    python310
-    python310Packages.ipython
-    python310Packages.pip
-    jdk
-    kotlin
-    chez
-    unstable.nodejs
-    unstable.nodePackages.npm
-    unstable.nodePackages.typescript
     rustup
-    ocaml
-    go
-    # lsp
-    unstable.rust-analyzer
-    gopls
-    python310Packages.python-lsp-server
-    kotlin-language-server
-    java-language-server
-    unstable.nodePackages.typescript-language-server
-    # vm
-    docker
-    qemu
-    # net-things
-    openssl
-    openvpn
-    vagrant
-    # etc
-    jetbrains.idea-community
-    obsidian
-    pinta
-    ffmpeg
-    mpv
-    spotify
-    # themes
-    gnome.gnome-tweaks
-    flat-remix-gnome
-    papirus-icon-theme
-    ];
-  # gc
+    docker-compose
+  ];
+
+  # GC
   nix.gc = {
     automatic = true;
     dates = "monthly";
     options = "--delete-older-than 30d";
   };  
-
-  # system environment
-  services.accounts-daemon.enable = true;
-  services.gnome.gnome-online-accounts.enable = true;
-  #environment.variables = {
-  #  WEBKIT_FORCE_SANDBOX = "0";
-  #};
 
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.
@@ -273,10 +191,6 @@ in
   #   enableSSHSupport = true;
   # };
 
-  # Automatic Upgrades
-  #system.autoUpgrade.enable = true;
-  #system.autoUpgrade.allowReboot = true;
-  
   # List services that you want to enable:
 
   # Enable the OpenSSH daemon.
@@ -294,6 +208,6 @@ in
   # this value at the release version of the first install of this system.
   # Before changing this value read the documentation for this option
   # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
-  system.stateVersion = "22.11"; # Did you read the comment?
-  
+  system.stateVersion = "23.05"; # Did you read the comment?
+
 }
