@@ -12,7 +12,7 @@
 (setq inhibit-startup-message t)
 (setq-default fill-column 80)
 (savehist-mode 1)
-
+(global-set-key (kbd "<mouse-2>") 'clipboard-yank)
 ;; message log
 (setq message-log-max 5000)
 
@@ -117,35 +117,42 @@
   (global-undo-tree-mode 1))
 
 ;; ;; everforest theme
-;; (add-to-list 'custom-theme-load-path "~/.emacs.d/everforest")
-;; (load-theme 'everforest-hard-dark t)
-(add-to-list 'default-frame-alist '(font . "Sarasa Mono J"))
-(set-face-attribute 'default t :font "Sarasa Mono J-20")
-;; (set-frame-font "Sarasa Mono J-20")
-
-(use-package arjen-grey-theme
-  :ensure t
-  :config ;(load-theme 'arjen-grey t)
-  )
-
-(use-package material-theme
-  :ensure t
-  :config ;(load-theme 'material-light t)
-  )
+ (add-to-list 'custom-theme-load-path "~/.emacs.d/everforest-theme")
+ (load-theme 'everforest-hard-dark t)
+;; (add-to-list 'default-frame-alist '(font . "Sarasa Mono J"))
+;; (set-face-attribute 'default t :font "Sarasa Mono J-20")
+;; (set-frame-font "Sarasa Mono J-18")
+(add-to-list 'default-frame-alist '(font . "JetBrains Mono Nerd Font-18"))
+(set-face-attribute 'default t :font "JetBrains Mono Nerd Font-18")
+(set-frame-font "JetBrains Mono Nerd Font-18")
 
 (use-package catppuccin-theme
   :ensure t
   :config
   (setq catppuccin-flavor 'latte) ;; or 'latte, 'macchiato, or 'mocha
-  (load-theme 'catppuccin t)
+  ;;(load-theme 'catppuccin t)
   (set-face-attribute 'line-number-current-line nil
 		      :foreground "purple")
   )
 
+(use-package dracula-theme
+  :ensure t
+  :config
+  ;;(load-theme 'dracula t)
+  (set-face-attribute 'line-number-current-line nil
+		      :foreground "gold"))
+
+(use-package material-theme
+  :ensure t
+  :config
+  ;;(load-theme 'material t)
+  (set-face-attribute 'line-number-current-line nil
+		      :foreground "gold"))
+
 (use-package color-theme-sanityinc-tomorrow
   :ensure t
   :config
-  ;; (load-theme 'sanityinc-tomorrow-day t)
+  ;;(load-theme 'sanityinc-tomorrow-eighties t)
   ;; (set-face-attribute 'line-number-current-line nil
   ;; 		      :foreground "purple")
   )
@@ -155,7 +162,7 @@
   :config
   (setq doom-themes-enable-bold t)
   (setq doom-themes-enable-italic t)
-  ;(load-theme 'doom-tokyo-night t)
+  ;;(load-theme 'doom-tokyo-night t)
   )
 
 ;; ivy-mode
@@ -226,8 +233,14 @@
 (use-package vterm
   :ensure t)
 
-;; ;; evil-mode  ;; trying agian 2023-04-19 11:43:16
-                 ;; failed. 2023-04-21 09:00:34
+;; ;; evil-mode
+;; trying agian 2023-04-19 11:43:16
+;; failed. 2023-04-21 09:00:34
+;; 2023-11-20 
+(use-package evil
+  :ensure t
+  :config (evil-mode 1)
+  (define-key evil-insert-state-map "jj" 'evil-normal-state))
 
 ;; smart-mode-line
 (use-package smart-mode-line-atom-one-dark-theme
@@ -328,8 +341,9 @@
 (use-package company
   :ensure t
   :defer t
-  :init (add-hook 'after-init-hook 'global-company-mode)
+  ;;:init (add-hook 'after-init-hook 'global-company-mode)
   :config
+  (global-company-mode 1)
   (setq company-idle-delay 0.0
 	company-minimum-prefix-length 1
 	company-selection-wrap-around t
@@ -350,9 +364,14 @@
 (use-package company-box
   :hook (company-mode . company-box-mode)
   :config
-  (setq company-box-backends-colors '(:candidate "purple" :annotation "#7C4Dff"
-						 :select (:background "purple" :foreground "white")))
+  ;; (setq company-box-backends-colors
+  ;; 	'(:candidate "purple" :annotation "#7C4Dff"
+  ;; 	  :select (:background "purple" :foreground "white")))
+  (setq company-box-backends-colors
+	'(:candidate "white" :annotation "#7C4Dff"
+   	  :select (:background "green" :foreground "white")))
   (add-to-list 'company-box-frame-parameters '(font . "Hack-14")))
+
 
 ;; counsel
 (use-package counsel
