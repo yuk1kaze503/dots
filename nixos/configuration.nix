@@ -3,7 +3,9 @@
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
 { config, pkgs, ... }:
-
+let 
+  unstable = import <nixos-unstable> {};
+in
 {
   imports =
     [ # Include the results of the hardware scan.
@@ -11,30 +13,28 @@
     ];
 
   # Bootloader.
-  #boot.loader.systemd-boot.enable = true;
-  #boot.loader.efi.canTouchEfiVariables = true;
   boot.loader = {
-    efi.canTouchEfiVariables = true;
-    efi.efiSysMountPoint = "/boot";
+    efi = {
+      canTouchEfiVariables = true;
+      efiSysMountPoint = "/boot";
+    };
     grub = {
       enable = true;
       devices = ["nodev"];
       efiSupport = true;
-      # useOSProber = true;
       extraEntries = ''
         menuentry "Windows" {
-          insmod part_gpt
-          insmod fat
-          insmod search_fs_uuid
-          insmod chain
+          insmode part_gpt
+          insmode fat
+          insmode search_fs_uuid
+          insmode chain
           search --fs-uuid --set=root 7C06-AAD2
           chainloader /EFI/Microsoft/Boot/bootmgfw.efi
         }
-      '';
+        '';
+        };
     };
-  };
 
-  time.hardwareClockInLocalTime = true;
   networking.hostName = "n1x0s"; # Define your hostname.
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
 
@@ -47,12 +47,12 @@
 
   # Set your time zone.
   time.timeZone = "Asia/Tokyo";
-
+  time.hardwareClockInLocalTime = true;
   # Select internationalisation properties.
-  i18n= {
+  i18n = { 
     defaultLocale = "en_US.UTF-8";
     supportedLocales = ["en_US.UTF-8/UTF-8" "zh_CN.UTF-8/UTF-8" "ja_JP.UTF-8/UTF-8" ];
-  };  
+  };
 
   i18n.extraLocaleSettings = {
     LC_ADDRESS = "en_US.UTF-8";
@@ -72,27 +72,37 @@
     [ fcitx5-mozc fcitx5-hangul fcitx5-rime fcitx5-gtk ];
   };
 
- # Fonts
+  # Fonts
   fonts.fonts = with pkgs; [
-  unicode-emoji
-  emojione
-  nerdfonts
-  source-han-serif
-  source-han-mono
-  sarasa-gothic
-  jetbrains-mono
-  cascadia-code
-  hack-font
-  noto-fonts-cjk-sans
-  noto-fonts-cjk-serif
-  ];
+    unicode-emoji
+    emojione
+    nerdfonts
+    source-han-serif
+    source-han-mono
+    sarasa-gothic
+    jetbrains-mono
+    cascadia-code
+    hack-font
+    noto-fonts-cjk-sans
+    noto-fonts-cjk-serif
+  ];  
 
   # Enable the X11 windowing system.
   services.xserver.enable = true;
 
-  # Enable the Cinnamon Desktop Environment.
-  services.xserver.displayManager.lightdm.enable = true;
-  services.xserver.desktopManager.cinnamon.enable = true;
+  # Nvidia driver
+  services.xserver.videoDrivers = ["nvidia"];
+  hardware.opengl.enable = true;
+  hardware.nvidia = {
+    # modesetting.eanble = true;
+    open = false;
+    nvidiaSettings = true;
+    package = config.boot.kernelPackages.nvidiaPackages.legacy_390;
+  };
+
+  # Enable the KDE Plasma Desktop Environment.
+  services.xserver.displayManager.sddm.enable = true;
+  services.xserver.desktopManager.plasma5.enable = true;
 
   # Configure keymap in X11
   services.xserver = {
@@ -127,15 +137,18 @@
   users.users.snow = {
     isNormalUser = true;
     description = "snowrain";
-    extraGroups = [ "networkmanager" "wheel" "docker"];
+    extraGroups = [ "networkmanager" "wheel" "docker" ];
     packages = with pkgs; [
-      firefox
-      emacs
+      firefox-esr
+      kate
+      google-chrome
+      emacs29
       neofetch
       lolcat
     #  thunderbird
     ];
   };
+  
   # emacs deamon
   services.emacs.enable = true;
 
@@ -143,39 +156,27 @@
   virtualisation = {
     docker.enable = true;
   };
-
-  users.groups.docker.members = [ "snow" ];
-
   
+  users.groups.docker.members = ["snowrain"];
+
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
-  #nixpkgs.config.allowUnfreePredicate = _: true;
-  
-  # Nvidia driver
-  services.xserver.videoDrivers = ["nvidia"];
-  hardware.opengl.enable = true;
-  hardware.nvidia = { 
-    modesetting.enable = true;
-    open = false;
-    nvidiaSettings = true;
-    package = config.boot.kernelPackages.nvidiaPackages.legacy_390;
-  };
 
   # List packages installed in system profile. To search, run:
   # $ nix search wget
   environment.systemPackages = with pkgs; [
   #  vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
   #  wget
-    vim
-    llvmPackages_15.llvm
-    clang_15
-    clang-tools_15
-    gcc
-    gdb
-    cmake
-    libtool
-    rustup
-    docker-compose
+  llvmPackages_15.llvm
+  clang_15
+  clang-tools_15
+  gcc
+  gdb
+  cmake
+  libtool
+  rustup
+  docker-compose
+  git
   ];
 
   # GC
@@ -183,7 +184,8 @@
     automatic = true;
     dates = "monthly";
     options = "--delete-older-than 30d";
-  };  
+  };
+
 
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.
