@@ -4,7 +4,7 @@
   home.file.".config/kitty/kitty.conf".text = ''
 
 #zshell
-#shell zsh
+shell zsh
 
 # Remove close window confirm
 confirm_os_window_close 0

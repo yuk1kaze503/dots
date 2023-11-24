@@ -130,14 +130,16 @@
     extraGroups = [ "networkmanager" "wheel" "docker"];
     packages = with pkgs; [
       firefox
-      emacs29
+      emacs
       neofetch
       lolcat
     #  thunderbird
     ];
   };
+  # emacs deamon
+  services.emacs.enable = true;
 
-  #vm
+  # vm
   virtualisation = {
     docker.enable = true;
   };

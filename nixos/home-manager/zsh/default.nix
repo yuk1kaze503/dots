@@ -2,11 +2,11 @@
 
 {
     programs = {
-        zsh = {
-            enable = true;
+      zsh = {
+        enable = true;
             oh-my-zsh = {
                 enable = true;
-                theme = "clean";
+                theme = "refined";
                 plugins = [
                     "git" "man" "thefuck" "copybuffer" "copypath"
                 ];
@@ -16,5 +16,5 @@
             enableCompletion = true;
             enableSyntaxHighlighting = true;
         };
-    };
+      };
 }
