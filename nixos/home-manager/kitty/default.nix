@@ -5,7 +5,7 @@
 
 #zshell
 shell zsh
-
+alias ssh="kitty +kitten ssh"
 # Remove close window confirm
 confirm_os_window_close 0
 
