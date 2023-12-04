@@ -12,7 +12,7 @@
 (setq inhibit-startup-message t)
 (setq-default fill-column 80)
 (savehist-mode 1)
-(global-set-key (kbd "<mouse-2>") 'clipboard-yank)
+;;(global-set-key (kbd "<mouse-2>") 'clipboard-yank)
 ;; message log
 (setq message-log-max 5000)
 
@@ -21,10 +21,10 @@
 (setq gc-cons-threshold 100000000)
 
 ;; ;; for mac to run shell env
-;; (when (memq window-system '(mac ns x))
-;;   (progn (exec-path-from-shell-initialize)
+(when (memq window-system '(mac ns x))
+  (progn (exec-path-from-shell-initialize)
 ;; ;; set meta key to command
-;;   (setq mac-command-modifier 'meta)))
+(setq mac-command-modifier 'meta)))
 
 ;; frame-size
 (defun set-frame-size-according-to-resolution ()
@@ -97,9 +97,9 @@
 	use-package-expand-minimally t))
 
 ;; ;; Garbbage collection magic hack
-;; (use-package gcmh
-;;   :ensure t
-;;   :init (gcmh-mode 1))
+ (use-package gcmh
+   :ensure t
+   :init (gcmh-mode 1))
 
 (use-package try
   :ensure t)
@@ -122,9 +122,7 @@
 ;; (add-to-list 'default-frame-alist '(font . "Sarasa Mono J"))
 ;; (set-face-attribute 'default t :font "Sarasa Mono J-20")
 ;; (set-frame-font "Sarasa Mono J-18")
-(add-to-list 'default-frame-alist '(font . "JetBrains Mono Nerd Font-18"))
-(set-face-attribute 'default t :font "JetBrains Mono Nerd Font-18")
-(set-frame-font "JetBrains Mono Nerd Font-18")
+(set-frame-font "Iosevka-20")
 
 (use-package catppuccin-theme
   :ensure t
@@ -157,13 +155,6 @@
   ;; 		      :foreground "purple")
   )
 
-(use-package doom-themes
-  :ensure t
-  :config
-  (setq doom-themes-enable-bold t)
-  (setq doom-themes-enable-italic t)
-  ;;(load-theme 'doom-tokyo-night t)
-  )
 
 ;; ivy-mode
 (use-package ivy
@@ -266,7 +257,9 @@
 
 (use-package visual-fill-column
   :ensure t
-  :defer t)
+  :config
+  (add-hook 'visual-line-mode #'visual-fill-column-mode)
+  (global-visual-fill-column-mode))
 
 (use-package hl-todo
   :diminish hl-todo
@@ -575,7 +568,7 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(custom-safe-themes
-   '("3c83b3676d796422704082049fc38b6966bcad960f896669dfc21a7a37a748fa" "4b287bfbd581ea819e5d7abe139db1fb5ba71ab945cec438c48722bea3ed6689" "adaf421037f4ae6725aa9f5654a2ed49e2cd2765f71e19a7d26a454491b486eb" "1b8d67b43ff1723960eb5e0cba512a2c7a2ad544ddb2533a90101fd1852b426e" "bb08c73af94ee74453c90422485b29e5643b73b05e8de029a6909af6a3fb3f58" "72ed8b6bffe0bfa8d097810649fd57d2b598deef47c992920aef8b5d9599eefe" "628278136f88aa1a151bb2d6c8a86bf2b7631fbea5f0f76cba2a0079cd910f7d" default))
+   '("443e2c3c4dd44510f0ea8247b438e834188dc1c6fb80785d83ad3628eadf9294" "3c83b3676d796422704082049fc38b6966bcad960f896669dfc21a7a37a748fa" "4b287bfbd581ea819e5d7abe139db1fb5ba71ab945cec438c48722bea3ed6689" "adaf421037f4ae6725aa9f5654a2ed49e2cd2765f71e19a7d26a454491b486eb" "1b8d67b43ff1723960eb5e0cba512a2c7a2ad544ddb2533a90101fd1852b426e" "bb08c73af94ee74453c90422485b29e5643b73b05e8de029a6909af6a3fb3f58" "72ed8b6bffe0bfa8d097810649fd57d2b598deef47c992920aef8b5d9599eefe" "628278136f88aa1a151bb2d6c8a86bf2b7631fbea5f0f76cba2a0079cd910f7d" default))
  '(package-selected-packages
    '(editorconfig smart-mode-line-powerline-theme tuareg magit-todos dired tree-sitter-langs tree-sitter cargo-mode rainbow-delimiters hl-todo magit-gitflow arjen-grey-theme exec-path-frome-shell counsel rainbow-mode visual-fill-column virtual-fill-column elpy smart-mode-line-atom-one-dark-theme smart-mode-line smart-jump auto-sudoedit cl-libify lsp-ivy lsp-ui lsp-mode eglot-java kotlin-mode python-mode doom-themes magit sanityinc-tomorrow-day solarized-theme material-theme color-theme-sanityinc-tomorrow key-chord organic-green-theme undo-tree everforest-theme everforest powerline-evil powerline evil vterm cl clang-format monokai-pro-theme nix-mode darkokai-theme darkokai gruvbox-theme yasnippet-snippets yasnippet tide typescript-mode all-the-icons-dired all-the-icons-ibuffer gcmh move-text zenburn-theme darcula-theme darcula zenburn exec-path-from-shell company-box python-black go-mode dracula-theme which-key try use-package))
  '(warning-suppress-log-types '((comp) (comp) (comp)))
