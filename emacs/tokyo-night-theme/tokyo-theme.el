@@ -12,7 +12,8 @@
 
 (let ((tokyo-bg "#24283b")
       (tokyo-bg-dark "#1f2335")
-      (tokyo-bg-hl "#292e42")
+      (tokyo-bg-hl "#efedf2")
+      ;;(tokyo-bg-hl "#292e42")
       (tokyo-fg "#c0caf5")
       (tokyo-fg-1 "#a9b1d6")
       (tokyo-fg-2 "#3b4261")

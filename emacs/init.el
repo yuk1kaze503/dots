@@ -110,50 +110,66 @@
 
 (use-package undo-tree
   :ensure t
+  :after evil
   :config
   (setq undo-tree-visualizer-diff t)
   (setq undo-tree-visualizer-timestamps t)
   (setq undo-tree-auto-save-history nil)
+  (evil-set-undo-system 'undo-tree)
   (global-undo-tree-mode 1))
 
 ;; ;; everforest theme
- (add-to-list 'custom-theme-load-path "~/.emacs.d/everforest-theme")
- (load-theme 'everforest-hard-dark t)
+(add-to-list 'custom-theme-load-path "~/.emacs.d/everforest-theme")
+;;(load-theme 'everforest-hard-dark t)
+(add-to-list 'custom-theme-load-path "~/.emacs.d/tokyo-night-theme")
+(load-theme 'tokyo t)
 ;; (add-to-list 'default-frame-alist '(font . "Sarasa Mono J"))
 ;; (set-face-attribute 'default t :font "Sarasa Mono J-20")
-;; (set-frame-font "Sarasa Mono J-18")
-(set-frame-font "Iosevka-20")
+
+(set-frame-font "Iosevka Nerd Font-22")
+
+(use-package modus-themes
+  :ensure t
+  :config
+  ;;(load-theme 'modus-operandi t) ;; Light theme
+  ;;(load-theme 'modus-vivendi t)  ;; Dark theme
+  )
 
 (use-package catppuccin-theme
   :ensure t
   :config
-  (setq catppuccin-flavor 'latte) ;; or 'latte, 'macchiato, or 'mocha
+  (setq catppuccin-flavor 'latte) ;; or 'frappe, 'macchiato, or 'mocha
   ;;(load-theme 'catppuccin t)
-  (set-face-attribute 'line-number-current-line nil
-		      :foreground "purple")
   )
 
 (use-package dracula-theme
   :ensure t
   :config
   ;;(load-theme 'dracula t)
-  (set-face-attribute 'line-number-current-line nil
-		      :foreground "gold"))
+  )
 
-(use-package material-theme
+(use-package gruvbox-theme
   :ensure t
   :config
-  ;;(load-theme 'material t)
-  (set-face-attribute 'line-number-current-line nil
-		      :foreground "gold"))
+  ;;(load-theme 'gruvbox-dark-soft t)
+  )
+
+(use-package vscode-dark-plus-theme
+  :ensure t
+  :config
+  ;;(load-theme 'vscode-dark-plus t)
+  )
 
 (use-package color-theme-sanityinc-tomorrow
   :ensure t
   :config
-  ;;(load-theme 'sanityinc-tomorrow-eighties t)
-  ;; (set-face-attribute 'line-number-current-line nil
-  ;; 		      :foreground "purple")
+  ;;(load-theme 'color-theme-sanityinc-tomorrow-night t)
   )
+
+(use-package unicode-fonts
+  :ensure t
+  :config
+  (unicode-fonts-setup))
 
 
 ;; ivy-mode
@@ -220,7 +236,7 @@
 ;;   (editorconfig-mode 1))
 
 ;; terminal-emulator
-;; installed vterm-module in home.nix
+;; installed vterm-module in home.nix(nixos)
 (use-package vterm
   :ensure t)
 
@@ -230,8 +246,24 @@
 ;; 2023-11-20 
 (use-package evil
   :ensure t
+  :init
+  (setq evil-want-integration t)
+  (setq evil-want-keybinding nil)
   :config (evil-mode 1)
-  (define-key evil-insert-state-map "jj" 'evil-normal-state))
+  ;(define-key evil-insert-state-map "jj" 'evil-normal-state)
+  )
+(use-package key-chord
+  :ensure t
+  :config
+  (setq key-chord-two-keys-delay 0.5)
+  (key-chord-define evil-insert-state-map "jh" 'evil-normal-state)
+  (key-chord-mode 1))
+
+(use-package evil-collection
+  :after evil
+  :ensure t
+  :config
+  (evil-collection-init))
 
 ;; smart-mode-line
 (use-package smart-mode-line-atom-one-dark-theme
@@ -363,8 +395,11 @@
   (setq company-box-backends-colors
 	'(:candidate "white" :annotation "#7C4Dff"
    	  :select (:background "green" :foreground "white")))
-  (add-to-list 'company-box-frame-parameters '(font . "Hack-14")))
+  (add-to-list 'company-box-frame-parameters '(font . "Hack Nerd Font-16")))
 
+(use-package fish-mode
+  :ensure t
+)
 
 ;; counsel
 (use-package counsel
@@ -568,9 +603,9 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(custom-safe-themes
-   '("443e2c3c4dd44510f0ea8247b438e834188dc1c6fb80785d83ad3628eadf9294" "3c83b3676d796422704082049fc38b6966bcad960f896669dfc21a7a37a748fa" "4b287bfbd581ea819e5d7abe139db1fb5ba71ab945cec438c48722bea3ed6689" "adaf421037f4ae6725aa9f5654a2ed49e2cd2765f71e19a7d26a454491b486eb" "1b8d67b43ff1723960eb5e0cba512a2c7a2ad544ddb2533a90101fd1852b426e" "bb08c73af94ee74453c90422485b29e5643b73b05e8de029a6909af6a3fb3f58" "72ed8b6bffe0bfa8d097810649fd57d2b598deef47c992920aef8b5d9599eefe" "628278136f88aa1a151bb2d6c8a86bf2b7631fbea5f0f76cba2a0079cd910f7d" default))
+   '("3c3507184cd9b63d58106de248415981dac5facdd22f7266f0b820a9c18f4f5b" "b4c8beafbdaf78e2624f0e4c06b00f40f833c7c8c1d1263f2201f719cb4b4ff9" "2858c51f2d5afa229e836bc303f5c0b7c672a9905a55e947922922b146b44d73" "4dcf06273c9f5f0e01cea95e5f71c3b6ee506f192d75ffda639d737964e2e14e" "603a831e0f2e466480cdc633ba37a0b1ae3c3e9a4e90183833bc4def3421a961" "7b303763746ab4ab92fd18d911073aadb1393d36263ba1f04f5e0641e94f6d54" "3de5c795291a145452aeb961b1151e63ef1cb9565e3cdbd10521582b5fd02e9a" "443e2c3c4dd44510f0ea8247b438e834188dc1c6fb80785d83ad3628eadf9294" "3c83b3676d796422704082049fc38b6966bcad960f896669dfc21a7a37a748fa" "4b287bfbd581ea819e5d7abe139db1fb5ba71ab945cec438c48722bea3ed6689" "adaf421037f4ae6725aa9f5654a2ed49e2cd2765f71e19a7d26a454491b486eb" "1b8d67b43ff1723960eb5e0cba512a2c7a2ad544ddb2533a90101fd1852b426e" "bb08c73af94ee74453c90422485b29e5643b73b05e8de029a6909af6a3fb3f58" "72ed8b6bffe0bfa8d097810649fd57d2b598deef47c992920aef8b5d9599eefe" "628278136f88aa1a151bb2d6c8a86bf2b7631fbea5f0f76cba2a0079cd910f7d" default))
  '(package-selected-packages
-   '(editorconfig smart-mode-line-powerline-theme tuareg magit-todos dired tree-sitter-langs tree-sitter cargo-mode rainbow-delimiters hl-todo magit-gitflow arjen-grey-theme exec-path-frome-shell counsel rainbow-mode visual-fill-column virtual-fill-column elpy smart-mode-line-atom-one-dark-theme smart-mode-line smart-jump auto-sudoedit cl-libify lsp-ivy lsp-ui lsp-mode eglot-java kotlin-mode python-mode doom-themes magit sanityinc-tomorrow-day solarized-theme material-theme color-theme-sanityinc-tomorrow key-chord organic-green-theme undo-tree everforest-theme everforest powerline-evil powerline evil vterm cl clang-format monokai-pro-theme nix-mode darkokai-theme darkokai gruvbox-theme yasnippet-snippets yasnippet tide typescript-mode all-the-icons-dired all-the-icons-ibuffer gcmh move-text zenburn-theme darcula-theme darcula zenburn exec-path-from-shell company-box python-black go-mode dracula-theme which-key try use-package))
+   '(modus-themes unicode-fonts fish-mode evil-collection editorconfig smart-mode-line-powerline-theme tuareg magit-todos dired tree-sitter-langs tree-sitter cargo-mode rainbow-delimiters hl-todo magit-gitflow arjen-grey-theme exec-path-frome-shell counsel rainbow-mode visual-fill-column virtual-fill-column elpy smart-mode-line-atom-one-dark-theme smart-mode-line smart-jump auto-sudoedit cl-libify lsp-ivy lsp-ui lsp-mode eglot-java kotlin-mode python-mode doom-themes magit sanityinc-tomorrow-day solarized-theme material-theme color-theme-sanityinc-tomorrow key-chord organic-green-theme undo-tree everforest-theme everforest powerline-evil powerline evil vterm cl clang-format monokai-pro-theme nix-mode darkokai-theme darkokai gruvbox-theme yasnippet-snippets yasnippet tide typescript-mode all-the-icons-dired all-the-icons-ibuffer gcmh move-text zenburn-theme darcula-theme darcula zenburn exec-path-from-shell company-box python-black go-mode dracula-theme which-key try use-package))
  '(warning-suppress-log-types '((comp) (comp) (comp)))
  '(warning-suppress-types '((comp) (comp) (comp) (comp) (comp) (comp))))
 (custom-set-faces
