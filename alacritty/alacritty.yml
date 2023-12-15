@@ -1,9 +1,12 @@
 # font
 font:
   normal:
-    family: Iosevka Nerd Font
+    family: ComicShannsMono Nerd Font
   size: 22
-
+window:
+  dimensions:
+    columns: 126
+    lines: 126
 scrolling:
   history: 1000
 
