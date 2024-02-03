@@ -287,11 +287,11 @@
   :ensure t
   :defer t)
 
-(use-package visual-fill-column
-  :ensure t
-  :config
-  (add-hook 'visual-line-mode #'visual-fill-column-mode)
-  (global-visual-fill-column-mode))
+;; (use-package visual-fill-column
+;;   :ensure t
+;;   :config
+;;   (add-hook 'visual-line-mode #'visual-fill-column-mode)
+;;   (global-visual-fill-column-mode))
 
 (use-package hl-todo
   :diminish hl-todo
@@ -348,39 +348,99 @@
 
 
 ;; company-mode
+
 (use-package company
   :ensure t
-  :defer t
-  ;;:init (add-hook 'after-init-hook 'global-company-mode)
+  :after company-statistics
+  :bind (("M-<tab>" . company-complete)
+	 :map company-active-map
+	 ("M-n" . nil)
+	 ("M-p" . nil)
+	 ("C-n" . company-select-next)
+	 ("C-p" . company-select-previous)
+	 ("C-s" . company-filter-candidates)
+	 :map company-search-map
+	 ("C-n" . company-select-next)
+	 ("C-p" . company-select-previous))
+  :init
+  (global-company-mode)
   :config
-  (global-company-mode 1)
-  (setq company-idle-delay 0.0
-	company-minimum-prefix-length 1
-	company-selection-wrap-around t
-	company-show-numbers t
-	company-tooltip-limit 12
-	)
-  (setq company-tooltip-minimum-width 60)
-  (setq company-tooltip-margin 60)
-  (setq company-tooltip-align-annotations t)
-  :bind
-  (:map company-active-map
-	("C-n" . company-select-next)
-	("C-p" . company-select-previous)
-	("M-<" . company-select-first)
-	("M->" . company-select-last)
-	("C-;" . company-complete-common)))
+  (define-key emacs-lisp-mode-map (kbd "C-M-i") nil)
+  (global-set-key (kbd "C-M-i") 'company-complete)
+  (setq completion-ignore-case t)
+  (setq company-idle-delay 0)
+  (setq company-minimum-prefix-length 2)
+  (setq company-selection-wrap-around t)
+  (setq company-transformers '(company-sort-by-occurrence company-sort-by-backend-importance)))
 
-(use-package company-box
-  :hook (company-mode . company-box-mode)
-  :config
-  ;; (setq company-box-backends-colors
-  ;; 	'(:candidate "purple" :annotation "#7C4Dff"
-  ;; 	  :select (:background "purple" :foreground "white")))
-  (setq company-box-backends-colors
-	'(:candidate "white" :annotation "#7C4Dff"
-   	  :select (:background "green" :foreground "white")))
-  (add-to-list 'company-box-frame-parameters '(font . "Hack Nerd Font-16")))
+(use-package company-statistics
+  :ensure t
+  :init
+  (company-statistics-mode))
+
+;; (use-package company-dwim
+;;   :straight '(company-dwim
+;; 	      :type git
+;; 	      :host github
+;; 	      :repo "zk-phi/company-dwim")
+;;   :ensure t
+;;   :init
+;;   (define-key company-active-map (kbd "TAB") 'company-dwim)
+;;   (setq company-frontends
+;; 	'(company-pseudo-tooltip-unless-just-one-frontend
+;; 	  company-dwim-frontend
+;; 	  company-echo-metadata-frontend)))
+
+;; (use-package company-anywhere
+;;   :ensure t)
+
+;; (use-package company-same-mode-buffers
+;;   :after company
+;;   :ensure t
+;;   :init
+;;   (require 'company-same-mode-buffers)
+;;   (company-same-mode-buffers-initialize)
+;;   :config
+;;   (setq company-backends
+;; 	'((company-capf :with company-same-mode-buffers)
+;; 	  (company-dabbrev-code :with company-same-mode-buffers)
+;; 	  company-keywords
+;; 	  company-files
+;; 	  company-dabbrev)))
+
+;; (use-package company
+;;   :ensure t
+;;   :defer t
+;;   ;;:init (add-hook 'after-init-hook 'global-company-mode)
+;;   :config
+;;   (global-company-mode 1)
+;;   (setq company-idle-delay 0.0
+;; 	company-minimum-prefix-length 1
+;; 	company-selection-wrap-around t
+;; 	company-show-numbers t
+;; 	company-tooltip-limit 12
+;; 	)
+;;   (setq company-tooltip-minimum-width 60)
+;;   (setq company-tooltip-margin 60)
+;;   (setq company-tooltip-align-annotations t)
+;;   :bind
+;;   (:map company-active-map
+;; 	("C-n" . company-select-next)
+;; 	("C-p" . company-select-previous)
+;; 	("M-<" . company-select-first)
+;; 	("M->" . company-select-last)
+;; 	("C-;" . company-complete-common)))
+
+;; (use-package company-box
+;;   :hook (company-mode . company-box-mode)
+;;   :config
+;;   ;; (setq company-box-backends-colors
+;;   ;; 	'(:candidate "purple" :annotation "#7C4Dff"
+;;   ;; 	  :select (:background "purple" :foreground "white")))
+;;   (setq company-box-backends-colors
+;; 	'(:candidate "white" :annotation "#7C4Dff"
+;;    	  :select (:background "green" :foreground "white")))
+;;   (add-to-list 'company-box-frame-parameters '(font . "Hack Nerd Font-16")))
 
 (use-package fish-mode
   :ensure t
@@ -403,6 +463,7 @@
   (add-to-list 'eglot-server-programs '(kotlin-mode . ("kotlin-language-server")))
   (add-to-list 'eglot-server-programs '(java-mode . ("java-language-server")))
   (add-to-list 'eglot-server-programs '(typescript-mode . ("typescript-language-server" "--stdio")))
+  (add-to-list 'eglot-server-programs '(zig-mode . ("zls")))
   (add-hook 'eglot--managed-mode-hook (lambda() (flymake-mode -1)))
   (add-hook 'c-mode-hook 'eglot-ensure)
   (add-hook 'c++-mode-hook 'eglot-ensure)
@@ -412,12 +473,20 @@
   (add-hook 'java-mode-hook 'eglot-ensure)
   (add-hook 'kotlin-mode-hook 'eglot-ensure)
   (add-hook 'typescript-mode-hook 'eglot-ensure)
-  ;; format on save
-  (add-hook 'c-mode-hook '(lambda() (add-hook 'before-save-hook 'eglot-format-buffer nil t)))
-  (add-hook 'c++-mode-hook '(lambda() (add-hook 'before-save-hook 'eglot-format-buffer nil t)))
-  (add-hook 'python-mode-hook '(lambda() (add-hook 'before-save-hook 'eglot-format-buffer nil t)))
+  (add-hook 'zig-mode-hook 'eglot-ensure)
+  ;; format on save disabled 03-02-2024
+  ;; (add-hook 'c-mode-hook '(lambda() (add-hook 'before-save-hook 'eglot-format-buffer nil t)))
+  ;; (add-hook 'c++-mode-hook '(lambda() (add-hook 'before-save-hook 'eglot-format-buffer nil t)))
+  ;; (add-hook 'python-mode-hook '(lambda() (add-hook 'before-save-hook 'eglot-format-buffer nil t)))
   (define-key eglot-mode-map (kbd "C-c r") 'eglot-rename)
   (define-key eglot-mode-map (kbd "C-c f") 'eglot-format))
+
+;; zig-mode
+(use-package zig-mode
+  :ensure t
+  :config
+  (autoload 'zig-mode "zig-mode" nil t)
+  (add-to-list 'auto-mode-alist '("\\.zig\\'" . zig-mode)))
 
 ;; go-mode
 (use-package go-mode
@@ -580,7 +649,7 @@
  '(custom-safe-themes
    '("71c615b0a662a491a5ae8266adfbd8f75dcb0b980f5fecae9dd6494121e4e5a5" "7b8f5bbdc7c316ee62f271acf6bcd0e0b8a272fdffe908f8c920b0ba34871d98" "b40f11c174e7e475508f1e2c1cfca354d37212494c143a494f27239c7d71a294" "90a6f96a4665a6a56e36dec873a15cbedf761c51ec08dd993d6604e32dd45940" "06f0b439b62164c6f8f84fdda32b62fb50b6d00e8b01c2208e55543a6337433a" "871b064b53235facde040f6bdfa28d03d9f4b966d8ce28fb1725313731a2bcc8" "ba323a013c25b355eb9a0550541573d535831c557674c8d59b9ac6aa720c21d3" "67f6b0de6f60890db4c799b50c0670545c4234f179f03e757db5d95e99bac332" "046a2b81d13afddae309930ef85d458c4f5d278a69448e5a5261a5c78598e012" "0527c20293f587f79fc1544a2472c8171abcc0fa767074a0d3ebac74793ab117" "2cc1b50120c0d608cc5064eb187bcc22c50390eb091fddfa920bf2639112adb6" "fc608d4c9f476ad1da7f07f7d19cc392ec0fb61f77f7236f2b6b42ae95801a62" "3c3507184cd9b63d58106de248415981dac5facdd22f7266f0b820a9c18f4f5b" "b4c8beafbdaf78e2624f0e4c06b00f40f833c7c8c1d1263f2201f719cb4b4ff9" "2858c51f2d5afa229e836bc303f5c0b7c672a9905a55e947922922b146b44d73" "4dcf06273c9f5f0e01cea95e5f71c3b6ee506f192d75ffda639d737964e2e14e" "603a831e0f2e466480cdc633ba37a0b1ae3c3e9a4e90183833bc4def3421a961" "7b303763746ab4ab92fd18d911073aadb1393d36263ba1f04f5e0641e94f6d54" "3de5c795291a145452aeb961b1151e63ef1cb9565e3cdbd10521582b5fd02e9a" "443e2c3c4dd44510f0ea8247b438e834188dc1c6fb80785d83ad3628eadf9294" "3c83b3676d796422704082049fc38b6966bcad960f896669dfc21a7a37a748fa" "4b287bfbd581ea819e5d7abe139db1fb5ba71ab945cec438c48722bea3ed6689" "adaf421037f4ae6725aa9f5654a2ed49e2cd2765f71e19a7d26a454491b486eb" "1b8d67b43ff1723960eb5e0cba512a2c7a2ad544ddb2533a90101fd1852b426e" "bb08c73af94ee74453c90422485b29e5643b73b05e8de029a6909af6a3fb3f58" "72ed8b6bffe0bfa8d097810649fd57d2b598deef47c992920aef8b5d9599eefe" "628278136f88aa1a151bb2d6c8a86bf2b7631fbea5f0f76cba2a0079cd910f7d" default))
  '(package-selected-packages
-   '(markdown-mode geiser-guile rust-mode smartparens vscode-dark-plus-theme catppuccin-theme ace-window modus-themes unicode-fonts fish-mode evil-collection editorconfig smart-mode-line-powerline-theme tuareg magit-todos dired tree-sitter-langs tree-sitter cargo-mode rainbow-delimiters hl-todo magit-gitflow arjen-grey-theme exec-path-frome-shell counsel rainbow-mode visual-fill-column virtual-fill-column elpy smart-mode-line-atom-one-dark-theme smart-mode-line smart-jump auto-sudoedit cl-libify lsp-ivy lsp-ui lsp-mode eglot-java kotlin-mode python-mode doom-themes magit sanityinc-tomorrow-day solarized-theme material-theme color-theme-sanityinc-tomorrow key-chord organic-green-theme undo-tree everforest-theme everforest powerline-evil powerline evil vterm cl clang-format monokai-pro-theme nix-mode darkokai-theme darkokai gruvbox-theme yasnippet-snippets yasnippet tide typescript-mode all-the-icons-dired all-the-icons-ibuffer gcmh move-text zenburn-theme darcula-theme darcula zenburn exec-path-from-shell company-box python-black go-mode dracula-theme which-key try use-package))
+   '(company-anywhere company-statistics zig-mode markdown-mode geiser-guile rust-mode smartparens vscode-dark-plus-theme catppuccin-theme ace-window modus-themes unicode-fonts fish-mode evil-collection editorconfig smart-mode-line-powerline-theme tuareg magit-todos dired tree-sitter-langs tree-sitter cargo-mode rainbow-delimiters hl-todo magit-gitflow arjen-grey-theme exec-path-frome-shell counsel rainbow-mode visual-fill-column virtual-fill-column elpy smart-mode-line-atom-one-dark-theme smart-mode-line smart-jump auto-sudoedit cl-libify lsp-ivy lsp-ui lsp-mode eglot-java kotlin-mode python-mode doom-themes magit sanityinc-tomorrow-day solarized-theme material-theme color-theme-sanityinc-tomorrow key-chord organic-green-theme undo-tree everforest-theme everforest powerline-evil powerline evil vterm cl clang-format monokai-pro-theme nix-mode darkokai-theme darkokai gruvbox-theme yasnippet-snippets yasnippet tide typescript-mode all-the-icons-dired all-the-icons-ibuffer gcmh move-text zenburn-theme darcula-theme darcula zenburn exec-path-from-shell company-box python-black go-mode dracula-theme which-key try use-package))
  '(warning-suppress-log-types '((comp) (comp) (comp)))
  '(warning-suppress-types '((comp) (comp) (comp) (comp) (comp) (comp))))
 (custom-set-faces
