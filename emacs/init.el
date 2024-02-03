@@ -474,6 +474,8 @@
   (add-hook 'kotlin-mode-hook 'eglot-ensure)
   (add-hook 'typescript-mode-hook 'eglot-ensure)
   (add-hook 'zig-mode-hook 'eglot-ensure)
+  (with-eval-after-load "eglot"
+    (add-to-list 'eglot-stay-out-of 'eldoc))
   ;; format on save disabled 03-02-2024
   ;; (add-hook 'c-mode-hook '(lambda() (add-hook 'before-save-hook 'eglot-format-buffer nil t)))
   ;; (add-hook 'c++-mode-hook '(lambda() (add-hook 'before-save-hook 'eglot-format-buffer nil t)))
