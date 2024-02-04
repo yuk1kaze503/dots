@@ -190,6 +190,7 @@
   (sp-with-modes 'rust-mode
     (sp-local-pair "'" nil :actions nil))
   (smartparens-global-mode t))
+(setq electric-pair-open-newline-between-pairs t)
 
 ;; ido mode
 (setq indo-enable-flex-matching t)
@@ -249,7 +250,7 @@
 (use-package key-chord
   :ensure t
   :config
-  (setq key-chord-two-keys-delay 0.5)
+  (setq key-chord-two-keys-delay 0.2)
   (key-chord-mode 1)
   (key-chord-define evil-insert-state-map "jh" 'evil-normal-state)
   )
@@ -475,7 +476,7 @@
   (add-hook 'typescript-mode-hook 'eglot-ensure)
   (add-hook 'zig-mode-hook 'eglot-ensure)
   (with-eval-after-load "eglot"
-    (add-to-list 'eglot-stay-out-of 'eldoc))
+    (add-to-list 'eglot-stay-out-of 'eldoc)) ;; disabled showing minibuffers
   ;; format on save disabled 03-02-2024
   ;; (add-hook 'c-mode-hook '(lambda() (add-hook 'before-save-hook 'eglot-format-buffer nil t)))
   ;; (add-hook 'c++-mode-hook '(lambda() (add-hook 'before-save-hook 'eglot-format-buffer nil t)))
