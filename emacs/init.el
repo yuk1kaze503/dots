@@ -372,7 +372,9 @@
   (setq company-idle-delay 0)
   (setq company-minimum-prefix-length 2)
   (setq company-selection-wrap-around t)
-  (setq company-transformers '(company-sort-by-occurrence company-sort-by-backend-importance)))
+  (setq company-transformers '(company-sort-by-occurrence company-sort-by-backend-importance))
+  (custom-set-faces
+ '(company-tooltip ((t (:background "#333c43" :foreground "#d3c6aa"))))))
 
 (use-package company-statistics
   :ensure t
