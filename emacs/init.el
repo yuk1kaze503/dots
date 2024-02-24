@@ -35,8 +35,8 @@
     ;; and smaller 80 column windows for smaller displays
     ;; pick whatever numbers make sense for you
     (if (> (x-display-pixel-width) 1280)
-           (add-to-list 'default-frame-alist (cons 'width 120))
-           (add-to-list 'default-frame-alist (cons 'width 80)))
+           (add-to-list 'default-frame-alist (cons 'width 200))
+           (add-to-list 'default-frame-alist (cons 'width 60)))
     ;; for the height, subtract a couple hundred pixels
     ;; from the screen height (for panels, menubars and
     ;; whatnot), then divide by the height of a char to
@@ -97,9 +97,30 @@
 	use-package-expand-minimally t))
 
 ;; ;; Garbbage collection magic hack
- (use-package gcmh
-   :ensure t
-   :init (gcmh-mode 1))
+(use-package gcmh
+  :ensure t
+  :config
+  (gcmh-mode 1))
+
+;; highlight cursor
+(use-package beacon
+  :ensure t
+  :config
+  (beacon-mode 1))
+
+(use-package volatile-highlights
+  :ensure t
+  :config
+  (volatile-highlights-mode 1))
+
+(use-package highlight-indent-guides
+  :ensure t
+  :config
+  (highlight-indent-guides-method . 'character)
+  (highlight-indent-guides-auto-character-face-perc . 20)
+  (highlight-indent-guides-character . ?\|)
+  :hook
+  (prog-mode-hook . highlight-indent-guides-mode))
 
 (use-package try
   :ensure t)
@@ -127,6 +148,7 @@
 ;; (set-face-attribute 'default t :font "Sarasa Mono J Nerd Font-20")
 ;; (set-frame-font "Sarasa Fixed J Nerd Font-22")
 (set-frame-font "ComicShannsMono Nerd Font-22")
+;;(set-frame-font "Cica-24")
 
 (use-package modus-themes
   :ensure t
@@ -191,6 +213,7 @@
     (sp-local-pair "'" nil :actions nil))
   (smartparens-global-mode t))
 (setq electric-pair-open-newline-between-pairs t)
+(electric-indent-mode 1)
 
 ;; ido mode
 (setq indo-enable-flex-matching t)
@@ -223,11 +246,11 @@
   :config
   (auto-sudoedit-mode 1))
 
-;; ;; editor config
-;; (use-package editorconfig
-;;   :ensure t
-;;   :config
-;;   (editorconfig-mode 1))
+;; editor config
+(use-package editorconfig
+  :ensure t
+  :config
+  (editorconfig-mode 1))
 
 ;; terminal-emulator
 ;; installed vterm-module in home.nix(nixos)
@@ -245,12 +268,15 @@
   (setq evil-want-keybinding nil)
   :config (evil-mode 1)
   (define-key evil-insert-state-map (kbd "C-e") 'end-of-line)
+  (define-key evil-insert-state-map (kbd "C-p") 'evil-previous-line)
+  (define-key evil-insert-state-map (kbd "C-n") 'evil-next-line)
+  (define-key evil-insert-state-map (kbd "C-d") 'delete-char)
   )
 
 (use-package key-chord
   :ensure t
   :config
-  (setq key-chord-two-keys-delay 0.2)
+  (setq key-chord-two-keys-delay 0.5)
   (key-chord-mode 1)
   (key-chord-define evil-insert-state-map "jh" 'evil-normal-state)
   )
@@ -261,17 +287,44 @@
   :config
   (evil-collection-init))
 
-;; smart-mode-line
-(use-package smart-mode-line-atom-one-dark-theme
+;; ;; smart-mode-line
+;; (use-package smart-mode-line-atom-one-dark-theme
+;;   :ensure t)
+;; (use-package smart-mode-line
+;;   :ensure t
+;;   :config
+;;   (setq sml/no-confirm-load-theme t)
+;;   (setq sml/theme 'respectful)
+;;   ;(setq sml/theme 'atom-one-dark)
+;;   ;(setq sml/thme 'light)
+;;   (sml/setup))
+
+;; (use-package mini-echo
+;;   :ensure t
+;;   :config
+;;   (mini-echo-mode 1))    
+
+(use-package all-the-icons
   :ensure t)
-(use-package smart-mode-line
+
+(use-package doom-modeline
   :ensure t
   :config
-  (setq sml/no-confirm-load-theme t)
-  (setq sml/theme 'respectful)
-  ;(setq sml/theme 'atom-one-dark)
-  ;(setq sml/thme 'light)
-  (sml/setup))
+  (doom-modeline-mode 1)
+  (setq doom-modeline-modal t)
+  (setq doom-modeline-modal-icon '𝝀)
+  (setq doom-modeline-buffer-file-name-style 'identity)
+  (setq doom-modeline-buffer-state-icon t)
+  (setq doom-modeline-bar-width 3)
+  (setq doom-modeline-height 25)
+  (setq doom-modeline-icon t)
+  (setq doom-modeline-major-mode-color-icon t)
+  (setq doom-modeline-minor-modes nil)
+  (setq doom-modeline-github nil)
+  (setq doom-modeline-mu4e nil)
+  (setq doom-modeline-irc nil)
+  (setq doom-modeline-time t)
+  (display-time-mode 1))
 
 (use-package ace-window
   :ensure t
@@ -654,14 +707,15 @@
  '(custom-safe-themes
    '("71c615b0a662a491a5ae8266adfbd8f75dcb0b980f5fecae9dd6494121e4e5a5" "7b8f5bbdc7c316ee62f271acf6bcd0e0b8a272fdffe908f8c920b0ba34871d98" "b40f11c174e7e475508f1e2c1cfca354d37212494c143a494f27239c7d71a294" "90a6f96a4665a6a56e36dec873a15cbedf761c51ec08dd993d6604e32dd45940" "06f0b439b62164c6f8f84fdda32b62fb50b6d00e8b01c2208e55543a6337433a" "871b064b53235facde040f6bdfa28d03d9f4b966d8ce28fb1725313731a2bcc8" "ba323a013c25b355eb9a0550541573d535831c557674c8d59b9ac6aa720c21d3" "67f6b0de6f60890db4c799b50c0670545c4234f179f03e757db5d95e99bac332" "046a2b81d13afddae309930ef85d458c4f5d278a69448e5a5261a5c78598e012" "0527c20293f587f79fc1544a2472c8171abcc0fa767074a0d3ebac74793ab117" "2cc1b50120c0d608cc5064eb187bcc22c50390eb091fddfa920bf2639112adb6" "fc608d4c9f476ad1da7f07f7d19cc392ec0fb61f77f7236f2b6b42ae95801a62" "3c3507184cd9b63d58106de248415981dac5facdd22f7266f0b820a9c18f4f5b" "b4c8beafbdaf78e2624f0e4c06b00f40f833c7c8c1d1263f2201f719cb4b4ff9" "2858c51f2d5afa229e836bc303f5c0b7c672a9905a55e947922922b146b44d73" "4dcf06273c9f5f0e01cea95e5f71c3b6ee506f192d75ffda639d737964e2e14e" "603a831e0f2e466480cdc633ba37a0b1ae3c3e9a4e90183833bc4def3421a961" "7b303763746ab4ab92fd18d911073aadb1393d36263ba1f04f5e0641e94f6d54" "3de5c795291a145452aeb961b1151e63ef1cb9565e3cdbd10521582b5fd02e9a" "443e2c3c4dd44510f0ea8247b438e834188dc1c6fb80785d83ad3628eadf9294" "3c83b3676d796422704082049fc38b6966bcad960f896669dfc21a7a37a748fa" "4b287bfbd581ea819e5d7abe139db1fb5ba71ab945cec438c48722bea3ed6689" "adaf421037f4ae6725aa9f5654a2ed49e2cd2765f71e19a7d26a454491b486eb" "1b8d67b43ff1723960eb5e0cba512a2c7a2ad544ddb2533a90101fd1852b426e" "bb08c73af94ee74453c90422485b29e5643b73b05e8de029a6909af6a3fb3f58" "72ed8b6bffe0bfa8d097810649fd57d2b598deef47c992920aef8b5d9599eefe" "628278136f88aa1a151bb2d6c8a86bf2b7631fbea5f0f76cba2a0079cd910f7d" default))
  '(package-selected-packages
-   '(company-anywhere company-statistics zig-mode markdown-mode geiser-guile rust-mode smartparens vscode-dark-plus-theme catppuccin-theme ace-window modus-themes unicode-fonts fish-mode evil-collection editorconfig smart-mode-line-powerline-theme tuareg magit-todos dired tree-sitter-langs tree-sitter cargo-mode rainbow-delimiters hl-todo magit-gitflow arjen-grey-theme exec-path-frome-shell counsel rainbow-mode visual-fill-column virtual-fill-column elpy smart-mode-line-atom-one-dark-theme smart-mode-line smart-jump auto-sudoedit cl-libify lsp-ivy lsp-ui lsp-mode eglot-java kotlin-mode python-mode doom-themes magit sanityinc-tomorrow-day solarized-theme material-theme color-theme-sanityinc-tomorrow key-chord organic-green-theme undo-tree everforest-theme everforest powerline-evil powerline evil vterm cl clang-format monokai-pro-theme nix-mode darkokai-theme darkokai gruvbox-theme yasnippet-snippets yasnippet tide typescript-mode all-the-icons-dired all-the-icons-ibuffer gcmh move-text zenburn-theme darcula-theme darcula zenburn exec-path-from-shell company-box python-black go-mode dracula-theme which-key try use-package))
+   '(highlight-indent-guides volatile-highlights beacon doom-modeline mini-echo moody company-anywhere company-statistics zig-mode markdown-mode geiser-guile rust-mode smartparens vscode-dark-plus-theme catppuccin-theme ace-window modus-themes unicode-fonts fish-mode evil-collection editorconfig smart-mode-line-powerline-theme tuareg magit-todos dired tree-sitter-langs tree-sitter cargo-mode rainbow-delimiters hl-todo magit-gitflow arjen-grey-theme exec-path-frome-shell counsel rainbow-mode visual-fill-column virtual-fill-column elpy smart-mode-line-atom-one-dark-theme smart-mode-line smart-jump auto-sudoedit cl-libify lsp-ivy lsp-ui lsp-mode eglot-java kotlin-mode python-mode doom-themes magit sanityinc-tomorrow-day solarized-theme material-theme color-theme-sanityinc-tomorrow key-chord organic-green-theme undo-tree everforest-theme everforest powerline-evil powerline evil vterm cl clang-format monokai-pro-theme nix-mode darkokai-theme darkokai gruvbox-theme yasnippet-snippets yasnippet tide typescript-mode all-the-icons-dired all-the-icons-ibuffer gcmh move-text zenburn-theme darcula-theme darcula zenburn exec-path-from-shell company-box python-black go-mode dracula-theme which-key try use-package))
  '(warning-suppress-log-types '((comp) (comp) (comp)))
- '(warning-suppress-types '((comp) (comp) (comp) (comp) (comp) (comp))))
+ '(warning-suppress-types '((comp))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(company-tooltip ((t (:background "#333c43" :foreground "#d3c6aa"))))
  '(fill-column-indicator ((t (:foreground "gray80" :weight normal))))
  '(multi-magit-repo-heading ((t (:inherit magit-section-heading :box nil))))
  '(speedbar-selected-face ((t (:foreground "#008B45" :underline t)))))
