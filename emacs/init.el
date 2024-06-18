@@ -1,4 +1,6 @@
 ;; default settings
+(setq byte-compile-warnings '(cl-functions))
+(setq debug-on-error t)
 (tool-bar-mode -1)
 (menu-bar-mode -1)
 (show-paren-mode 1)
@@ -101,17 +103,6 @@
   :ensure t
   :config
   (gcmh-mode 1))
-
-;; highlight cursor
-(use-package beacon
-  :ensure t
-  :config
-  (beacon-mode 1))
-
-(use-package volatile-highlights
-  :ensure t
-  :config
-  (volatile-highlights-mode 1))
 
 (use-package highlight-indent-guides
   :ensure t
