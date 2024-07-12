@@ -107,11 +107,13 @@
 (use-package highlight-indent-guides
   :ensure t
   :config
-  (highlight-indent-guides-method . 'character)
-  (highlight-indent-guides-auto-character-face-perc . 20)
-  (highlight-indent-guides-character . ?\|)
+  (setq highlight-indent-guides-method 'character)
+  ;;(setq highlight-indent-guides-responsive "stack")
+  ;; (highlight-indent-guides-method . 'character)
+  ;; (highlight-indent-guides-auto-character-face-perc . 20)
+  ;; (highlight-indent-guides-character . ?\|)
   :hook
-  (prog-mode-hook . highlight-indent-guides-mode))
+  (prog-mode . highlight-indent-guides-mode))
 
 (use-package try
   :ensure t)
