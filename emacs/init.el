@@ -108,10 +108,9 @@
   :ensure t
   :config
   (setq highlight-indent-guides-method 'character)
-  ;;(setq highlight-indent-guides-responsive "stack")
-  ;; (highlight-indent-guides-method . 'character)
-  ;; (highlight-indent-guides-auto-character-face-perc . 20)
-  ;; (highlight-indent-guides-character . ?\|)
+  ;; (setq highlight-indent-guides-method 'bitmap)
+(setq highlight-indent-guides-responsive "stack")
+  ;; (set-face-background 'highlight-indent-guides-character-face "dimgray") 
   :hook
   (prog-mode . highlight-indent-guides-mode))
 
@@ -136,7 +135,7 @@
 (add-to-list 'custom-theme-load-path "~/.emacs.d/everforest-theme")
 (load-theme 'everforest-hard-dark t)
 (add-to-list 'custom-theme-load-path "~/.emacs.d/tokyo-night-theme")
-;;(load-theme 'tokyo t)
+;; (load-theme 'tokyo t)
 ;; (add-to-list 'default-frame-alist '(font . "Sarasa Mono J Nerd Font"))
 ;; (set-face-attribute 'default t :font "Sarasa Mono J Nerd Font-20")
 ;; (set-frame-font "Sarasa Fixed J Nerd Font-22")
