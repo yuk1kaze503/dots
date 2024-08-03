@@ -19,8 +19,14 @@
 (setq message-log-max 5000)
 
 ;; 4 lsp performance
-(setq read-process-output-max (* 2 1024 1024))
-(setq gc-cons-threshold 100000000)
+;; added at eglot init 03-08-2024
+;; (setq read-process-output-max (* 2 1024 1024))
+;; (setq gc-cons-threshold 100000000)
+
+;; defconst 4 os-type
+(defconst IS-MAC (eq system-type 'darwin))
+(defconst IS-LINUX (memq system-type '(gnu gnu/linux gnu/kfreebsd berkeley-unix)))
+(defconst IS-WINDOWS (memq system-type '(cygwin windows-nt ms-dos)))
 
 ;; ;; for mac to run shell env
 (when (memq window-system '(mac ns x))
