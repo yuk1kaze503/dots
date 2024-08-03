@@ -14,7 +14,7 @@
 (setq inhibit-startup-message t)
 (setq-default fill-column 80)
 (savehist-mode 1)
-(setq use-short-answers t)
+;;(global-set-key (kbd "<mouse-2>") 'clipboard-yank)
 ;; message log
 (setq message-log-max 5000)
 
@@ -98,360 +98,11 @@
   (setq use-package-always-ensure t
 	use-package-expand-minimally t))
 
-;; auto package update
-(use-package auto-package-update
-  :config
-  (setq auto-package-update-interval 1)
-  (auto-package-update-maybe))
-
-;; auto-save-visited
-(use-package files
-  :ensure nil
-  :config
-  (setq auto-save-visited-interval 30)
-  (auto-save-visited-mode 1))
-
-;;emacsclient
-(use-package server
-  :config
-  (unless (server-running-p)
-    (server-start)))
-
-;; recent file log
-(use-package recentf
-  :init
-  (setq recentf-max-saved-items 100)
-  (recentf-mode 1))
-
-;; paren-things
-(use-package paren
-  :init
-  (show-paren-mode 1))
-(use-package elec-pair
-  :config
-  (electric-pair-mode 1))
-
 ;; ;; Garbbage collection magic hack
-(setq gc-cons-percentage 0.2
-      gc-cons-threshold (* 128 1024 1024))
-(setq garbage-collection-messages t)
-
-;; 4long line file
-(use-package so-long
-  :init
-  (global-so-long-mode 1))
-
-;; 4 performance
-(setq blink-matching-paren nil)
-(setq vc-handled-backends '(Git))
-(setq auto-mode-case-fold nil)
-(setq-default bidi-display-reordering 'left-to-right)
-(setq bidi-inhibit-bpa t)
-(setq-default cursor-in-non-selected-windows nil)
-(setq highlight-nonselected-windows nil)
-(setq fast-but-imprecise-scrolling t)
-(setq ffap-machine-p-known 'reject)
-(setq idle-update-delay 1.0)
-(setq redisplay-skip-fontification-on-input t)
-(setq command-line-ns-option-alist nil) ;;4 mac
-
-;; org-things
-(use-package org
-  :init
-  (setq org-return-follows-link t
-	org-mouse-1-follows-link t))
-
-(setq org-use-sub-superscripts '{}
-      org-export-with-sub-superscripts nil)
-
-(use-package org-agenda
-  :ensure nil
-  :after org
-  :config
-  (setq org-agenda-files (file-expand-wildcards (concat org-directory "/*.org"))))
-
-(use-package org-indent
-  :ensure nil
-  :hook (org-mode . org-indent-mode))
-
-(use-package org-pomodoro
-  :after org)
-
-(use-package ox-qmd
-  :defer t) ;; C-c C-e for export org to markdown
-
-(use-package org-modern
-  :after org
-  :init
-  (setq
-   ;; Edit settings
-   org-auto-align-tags nil
-   org-tags-column 0
-   org-fold-catch-invisible-edits 'show-and-error
-   org-special-ctrl-a/e t
-   org-insert-heading-respect-content t
-
-   ;; Org styling, hide markup etc.
-   org-hide-emphasis-markers t
-   org-pretty-entities t
-   org-ellipsis "…"
-
-   ;; Agenda styling
-   org-agenda-tags-column 0
-   org-agenda-block-separator ?─
-   org-agenda-time-grid
-   '((daily today require-timed)
-     (800 1000 1200 1400 1600 1800 2000)
-     " ┄┄┄┄┄ " "┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄")
-   org-agenda-current-time-string
-   "⭠ now ─────────────────────────────────────────────────")
-
-  :config
-  (global-org-modern-mode 1))
-
-;; icons
-(use-package nerd-icons)
-(use-package nerd-icons-completion
-  :hook (after-init . nerd-icons-completion-mode))
-(use-package nerd-icons-dired
-  :hook (dired-mode . nerd-icons-dired-mode))
-
-;; corfu
-(use-package corfu
-  ;; Optional customizations
-  :custom
-  (corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
-  (corfu-auto t)                 ;; Enable auto completion
-  ;; (corfu-separator ?\s)          ;; Orderless field separator
-  ;; (corfu-quit-at-boundary nil)   ;; Never quit at completion boundary
-  ;; (corfu-quit-no-match nil)      ;; Never quit, even if there is no match
-  ;; (corfu-preview-current nil)    ;; Disable current candidate preview
-  ;; (corfu-preselect 'prompt)      ;; Preselect the prompt
-  (corfu-on-exact-match nil)     ;; Configure handling of exact matches
-  ;; (corfu-scroll-margin 5)        ;; Use scroll margin
-  (corfu-count 16)
-  (corfu-auto-prefix 1)
-  (corfu-auto-delay 0)
-  ;; Enable Corfu only for certain modes. See also `global-corfu-modes'.
-  ;; :hook ((prog-mode . corfu-mode)
-  ;;        (shell-mode . corfu-mode)
-  ;;        (eshell-mode . corfu-mode))
-
-  ;; Recommended: Enable Corfu globally.  This is recommended since Dabbrev can
-  ;; be used globally (M-/).  See also the customization variable
-  ;; `global-corfu-modes' to exclude certain modes.
-  :init
-  (global-corfu-mode))
-
-(use-package corfu-popupinfo
-  :ensure nil
-  :hook (corfu-mode .corfu-popupinfo-mode))
-
-(use-package corfu-terminal
-  :unless (display-graphic-p)
-  :config
-  (corfu-terminal-mode 1))
-
-(use-package corfu-prescient
-  :config
-  (setq corfu-prescient-enable-filtering nil)
-  (corfu-prescient-mode 1))
-
-
-;;TODO: config 4 orderless
-(use-package orderless
+(use-package gcmh
   :ensure t
-  :custom
-  (completion-styles '(orderless basic))
-  (completion-category-overrides '((file (styles basic partial-completion)))))
-
-(use-package prescient
   :config
-  (setq prescient-aggressive-file-save t)
-  (prescient-persist-mode 1))
-
-
-;; vertico repalce helm & ivy
-(use-package vertico
-  :init
-  (setq vertico-cycle t)
-  (vertico-mode 1))
-;; TODO: set evil key for vertico-repeat
-;; (use-package vertico-repeat
-;;   :ensure nil
-;;   :after vertico
-;;   :hook (minibuffer-setup . vertico-repeat-save))
-
-(use-package vertico-directory
-  :ensure nil
-  :after vertico
-  :bind ( :map vertico-map
-          ("<backspace>" . vertico-directory-delete-char)))
-
-(use-package vertico-buffer
-  :ensure nil
-  :config
-  (setq vertico-buffer-display-action '(display-buffer-at-bottom))
-  (vertico-buffer-mode 1))
-
-(use-package vertico-prescient
-  :config
-  (setq vertico-prescient-enable-filtering nil)
-  (vertico-prescient-mode 1))
-
-(use-package marginalia
-  :init
-  (marginalia-mode 1))
-
-(use-package embark
-  :bind (("C-." . embark-act)         ;; pick some comfortable binding
-         ("C-;" . embark-dwim)        ;; good alternative: M-.
-         ("C-h B" . embark-bindings)) ;; alternative for `describe-bindings'
-  :init
-  (setq prefix-help-command #'embark-prefix-help-command)
-
-  :config
-  ;; Hide the mode line of the Embark live/completions buffers
-  (add-to-list 'display-buffer-alist
-               '("\\`\\*Embark Collect \\(Live\\|Completions\\)\\*"
-                 nil
-                 (window-parameters (mode-line-format . none)))))
-
-(use-package embark-consult
-  :hook (embark-collect-mode . consult-preview-at-point-mode))
-
-
-;; A few more useful configurations...
-(use-package emacs
-  :custom
-  ;; TAB cycle if there are only few candidates
-  ;; (completion-cycle-threshold 3)
-
-  ;; Enable indentation+completion using the TAB key.
-  ;; `completion-at-point' is often bound to M-TAB.
-  (tab-always-indent 'complete)
-
-  ;; Emacs 30 and newer: Disable Ispell completion function. As an alternative,
-  ;; try `cape-dict'.
-  (text-mode-ispell-word-completion nil)
-
-  ;; Emacs 28 and newer: Hide commands in M-x which do not apply to the current
-  ;; mode.  Corfu commands are hidden, since they are not used via M-x. This
-  ;; setting is useful beyond Corfu.
-  (read-extended-command-predicate #'command-completion-default-include-p))
-
-;; TODO: config consult
-;; Example configuration for Consult
-(use-package consult
-  ;; Replace bindings. Lazily loaded by `use-package'.
-  :bind (;; C-c bindings in `mode-specific-map'
-         ("C-c M-x" . consult-mode-command)
-         ("C-c h" . consult-history)
-         ("C-c k" . consult-kmacro)
-         ("C-c m" . consult-man)
-         ("C-c i" . consult-info)
-         ([remap Info-search] . consult-info)
-         ;; C-x bindings in `ctl-x-map'
-         ("C-x M-:" . consult-complex-command)     ;; orig. repeat-complex-command
-         ("C-x b" . consult-buffer)                ;; orig. switch-to-buffer
-         ("C-x 4 b" . consult-buffer-other-window) ;; orig. switch-to-buffer-other-window
-         ("C-x 5 b" . consult-buffer-other-frame)  ;; orig. switch-to-buffer-other-frame
-         ("C-x t b" . consult-buffer-other-tab)    ;; orig. switch-to-buffer-other-tab
-         ("C-x r b" . consult-bookmark)            ;; orig. bookmark-jump
-         ("C-x p b" . consult-project-buffer)      ;; orig. project-switch-to-buffer
-         ;; Custom M-# bindings for fast register access
-         ("M-#" . consult-register-load)
-         ("M-'" . consult-register-store)          ;; orig. abbrev-prefix-mark (unrelated)
-         ("C-M-#" . consult-register)
-         ;; Other custom bindings
-         ("M-y" . consult-yank-pop)                ;; orig. yank-pop
-         ;; M-g bindings in `goto-map'
-         ("M-g e" . consult-compile-error)
-         ("M-g f" . consult-flymake)               ;; Alternative: consult-flycheck
-         ("M-g g" . consult-goto-line)             ;; orig. goto-line
-         ("M-g M-g" . consult-goto-line)           ;; orig. goto-line
-         ("M-g o" . consult-outline)               ;; Alternative: consult-org-heading
-         ("M-g m" . consult-mark)
-         ("M-g k" . consult-global-mark)
-         ("M-g i" . consult-imenu)
-         ("M-g I" . consult-imenu-multi)
-         ;; M-s bindings in `search-map'
-         ("M-s d" . consult-find)                  ;; Alternative: consult-fd
-         ("M-s c" . consult-locate)
-         ("M-s g" . consult-grep)
-         ("M-s G" . consult-git-grep)
-         ("M-s r" . consult-ripgrep)
-         ("M-s l" . consult-line)
-         ("M-s L" . consult-line-multi)
-         ("M-s k" . consult-keep-lines)
-         ("M-s u" . consult-focus-lines)
-         ;; Isearch integration
-         ("M-s e" . consult-isearch-history)
-         :map isearch-mode-map
-         ("M-e" . consult-isearch-history)         ;; orig. isearch-edit-string
-         ("M-s e" . consult-isearch-history)       ;; orig. isearch-edit-string
-         ("M-s l" . consult-line)                  ;; needed by consult-line to detect isearch
-         ("M-s L" . consult-line-multi)            ;; needed by consult-line to detect isearch
-         ;; Minibuffer history
-         :map minibuffer-local-map
-         ("M-s" . consult-history)                 ;; orig. next-matching-history-element
-         ("M-r" . consult-history))                ;; orig. previous-matching-history-element
-
-  ;; Enable automatic preview at point in the *Completions* buffer. This is
-  ;; relevant when you use the default completion UI.
-  :hook (completion-list-mode . consult-preview-at-point-mode)
-
-  ;; The :init configuration is always executed (Not lazy)
-  :init
-
-  ;; Optionally configure the register formatting. This improves the register
-  ;; preview for `consult-register', `consult-register-load',
-  ;; `consult-register-store' and the Emacs built-ins.
-  (setq register-preview-delay 0.5
-        register-preview-function #'consult-register-format)
-
-  ;; Optionally tweak the register preview window.
-  ;; This adds thin lines, sorting and hides the mode line of the window.
-  (advice-add #'register-preview :override #'consult-register-window)
-
-  ;; Use Consult to select xref locations with preview
-  (setq xref-show-xrefs-function #'consult-xref
-        xref-show-definitions-function #'consult-xref)
-
-  ;; Configure other variables and modes in the :config section,
-  ;; after lazily loading the package.
-  :config
-
-  ;; Optionally configure preview. The default value
-  ;; is 'any, such that any key triggers the preview.
-  ;; (setq consult-preview-key 'any)
-  ;; (setq consult-preview-key "M-.")
-  ;; (setq consult-preview-key '("S-<down>" "S-<up>"))
-  ;; For some commands and buffer sources it is useful to configure the
-  ;; :preview-key on a per-command basis using the `consult-customize' macro.
-  (consult-customize
-   consult-theme :preview-key '(:debounce 0.2 any)
-   consult-ripgrep consult-git-grep consult-grep
-   consult-bookmark consult-recent-file consult-xref
-   consult--source-bookmark consult--source-file-register
-   consult--source-recent-file consult--source-project-recent-file
-   ;; :preview-key "M-."
-   :preview-key '(:debounce 0.4 any))
-
-  ;; Optionally configure the narrowing key.
-  ;; Both < and C-+ work reasonably well.
-  (setq consult-narrow-key "<") ;; "C-+"
-
-  ;; Optionally make narrowing help available in the minibuffer.
-  ;; You may want to use `embark-prefix-help-command' or which-key instead.
-  ;; (keymap-set consult-narrow-map (concat consult-narrow-key " ?") #'consult-narrow-help)
-)
-
-(use-package consult-eglot
-  :after eglot
-  :bind ( :map eglot-mode-map
-          ("C-c s" . consult-eglot-symbols)))
-
+  (gcmh-mode 1))
 
 (use-package highlight-indent-guides
   :ensure t
@@ -463,35 +114,12 @@
   :hook
   (prog-mode . highlight-indent-guides-mode))
 
-(use-package tempel
-  :demand t
-  :bind (("M-+" . tempel-complete) ;; Alternative tempel-expand
-         ("M-*" . tempel-insert)))
-(use-package tempel-collection
-  :after tempel)
-
-(use-package eglot-tempel
-  :after (eglot tempel)
-  :hook (eglot-managed-mode . eglot-tempel-mode))
-
-(use-package jsonrpc
-  :defer t
-  :config
-  (setq jsonrpc-default-request-timeout 3000)
-  (fset #'jsonrpc--log-event #'ignore))
-
+(use-package try
+  :ensure t)
 
 (use-package which-key
   :ensure t
   :config (which-key-mode))
-
-(use-package undo-fu
-  :config
-  (with-eval-after-load 'evil
-    (setq evil-undo-system 'undo-fu)))
-(use-package undo-fu-session
-  :config
-  (undo-fu-session-global-mode 1))
 
 (use-package undo-tree
   :ensure t
@@ -503,24 +131,9 @@
   (evil-set-undo-system 'undo-tree)
   (global-undo-tree-mode 1))
 
-(use-package dashboard
-  :config
-  (setq dashboard-center-content t)
-  (dashboard-setup-startup-hook))
-
-(use-package rainbow-delimiters
-  :hook (prog-mode . rainbow-delimiters-mode))
-
-(use-package imenu-list
-  :bind ( :map my-toggle-map
-          ("i" . imenu-list-smart-toggle))
-  :init
-  (setq imenu-list-position 'left))
-
-
 ;; ;; everforest theme
 (add-to-list 'custom-theme-load-path "~/.emacs.d/everforest-theme")
-;; (load-theme 'everforest-hard-dark t)
+(load-theme 'everforest-hard-dark t)
 (add-to-list 'custom-theme-load-path "~/.emacs.d/tokyo-night-theme")
 ;; (load-theme 'tokyo t)
 ;; (add-to-list 'default-frame-alist '(font . "Sarasa Mono J Nerd Font"))
@@ -528,11 +141,6 @@
 ;; (set-frame-font "Sarasa Fixed J Nerd Font-22")
 (set-frame-font "ComicShannsMono Nerd Font-22")
 ;;(set-frame-font "Cica-24")
-(use-package ef-themes
-  :config
-  (setq ef-themes-mixed-fonts t
-        ef-themes-variable-pitch-ui t)
-  (load-theme 'ef-melissa-light t))
 
 (use-package modus-themes
   :ensure t
@@ -574,35 +182,35 @@
   :config
   (unicode-fonts-setup))
 
-;; ;; ivy-mode
-;; (use-package ivy
-;;   :ensure t
-;;   :config
-;;   (ivy-mode 1)
-;;   (setq ivy-use-virtual-buffers t)
-;;   (setq ivy-use-selectable-prompt t)
-;;   (setq enable-recursive-minibuffers t))
+;; ivy-mode
+(use-package ivy
+  :ensure t
+  :config
+  (ivy-mode 1)
+  (setq ivy-use-virtual-buffers t)
+  (setq ivy-use-selectable-prompt t)
+  (setq enable-recursive-minibuffers t))
 
-;; ;; swipe
-;; (use-package swiper
-;;   :ensure t
-;;   :bind
-;;   ("C-s" . swiper))
+;; swipe
+(use-package swiper
+  :ensure t
+  :bind
+  ("C-s" . swiper))
 
-;; ;; smartparens
-;; (use-package smartparens
-;;   :ensure t
-;;   :config
-;;   (sp-with-modes 'rust-mode
-;;     (sp-local-pair "'" nil :actions nil))
-;;   (smartparens-global-mode t))
-;; (setq electric-pair-open-newline-between-pairs t)
-;; (electric-indent-mode 1)
+;; smartparens
+(use-package smartparens
+  :ensure t
+  :config
+  (sp-with-modes 'rust-mode
+    (sp-local-pair "'" nil :actions nil))
+  (smartparens-global-mode t))
+(setq electric-pair-open-newline-between-pairs t)
+(electric-indent-mode 1)
 
-;; ;; ido mode
-;; (setq indo-enable-flex-matching t)
-;; (setq ido-everywhere t)
-;; (ido-mode 1)
+;; ido mode
+(setq indo-enable-flex-matching t)
+(setq ido-everywhere t)
+(ido-mode 1)
 
 ;; magit
 (use-package magit
@@ -671,6 +279,26 @@
   :config
   (evil-collection-init))
 
+;; ;; smart-mode-line
+;; (use-package smart-mode-line-atom-one-dark-theme
+;;   :ensure t)
+;; (use-package smart-mode-line
+;;   :ensure t
+;;   :config
+;;   (setq sml/no-confirm-load-theme t)
+;;   (setq sml/theme 'respectful)
+;;   ;(setq sml/theme 'atom-one-dark)
+;;   ;(setq sml/thme 'light)
+;;   (sml/setup))
+
+;; (use-package mini-echo
+;;   :ensure t
+;;   :config
+;;   (mini-echo-mode 1))    
+
+(use-package all-the-icons
+  :ensure t)
+
 (use-package doom-modeline
   :ensure t
   :config
@@ -696,15 +324,20 @@
   (global-set-key (kbd "M-o") 'ace-window)
   )
 
-;; ;; Utilities
-;; (use-package s
-;;   :ensure t
-;;   :defer t)
+;; Utilities
+(use-package s
+  :ensure t
+  :defer t)
 
-;; (use-package dash
-;;   :ensure t
-;;   :defer t)
+(use-package dash
+  :ensure t
+  :defer t)
 
+;; (use-package visual-fill-column
+;;   :ensure t
+;;   :config
+;;   (add-hook 'visual-line-mode #'visual-fill-column-mode)
+;;   (global-visual-fill-column-mode))
 
 (use-package hl-todo
   :diminish hl-todo
@@ -729,11 +362,11 @@
 (when (memq window-system '(mac ns))
 	    (setq mac-command-modifier 'meta))
 
-;; ;; smart-jump
-;; (use-package smart-jump
-;;   :ensure t
-;;   :config
-;;   (smart-jump-setup-default-registers))
+;; smart-jump
+(use-package smart-jump
+  :ensure t
+  :config
+  (smart-jump-setup-default-registers))
 
 ;; clang-format
 (use-package clang-format
@@ -760,17 +393,115 @@
 				 (flyspell-prog-mode))))
 
 
+;; company-mode
+
+(use-package company
+  :ensure t
+  :after company-statistics
+  :bind (("M-<tab>" . company-complete)
+	 :map company-active-map
+	 ("M-n" . nil)
+	 ("M-p" . nil)
+	 ("C-n" . company-select-next)
+	 ("C-p" . company-select-previous)
+	 ("C-s" . company-filter-candidates)
+	 :map company-search-map
+	 ("C-n" . company-select-next)
+	 ("C-p" . company-select-previous))
+  :init
+  (global-company-mode)
+  :config
+  (define-key emacs-lisp-mode-map (kbd "C-M-i") nil)
+  (global-set-key (kbd "C-M-i") 'company-complete)
+  (setq completion-ignore-case t)
+  (setq company-idle-delay 0)
+  (setq company-minimum-prefix-length 2)
+  (setq company-selection-wrap-around t)
+  (setq company-transformers '(company-sort-by-occurrence company-sort-by-backend-importance))
+  (custom-set-faces
+ '(company-tooltip ((t (:background "#333c43" :foreground "#d3c6aa"))))))
+
+(use-package company-statistics
+  :ensure t
+  :init
+  (company-statistics-mode))
+
+;; (use-package company-dwim
+;;   :straight '(company-dwim
+;; 	      :type git
+;; 	      :host github
+;; 	      :repo "zk-phi/company-dwim")
+;;   :ensure t
+;;   :init
+;;   (define-key company-active-map (kbd "TAB") 'company-dwim)
+;;   (setq company-frontends
+;; 	'(company-pseudo-tooltip-unless-just-one-frontend
+;; 	  company-dwim-frontend
+;; 	  company-echo-metadata-frontend)))
+
+;; (use-package company-anywhere
+;;   :ensure t)
+
+;; (use-package company-same-mode-buffers
+;;   :after company
+;;   :ensure t
+;;   :init
+;;   (require 'company-same-mode-buffers)
+;;   (company-same-mode-buffers-initialize)
+;;   :config
+;;   (setq company-backends
+;; 	'((company-capf :with company-same-mode-buffers)
+;; 	  (company-dabbrev-code :with company-same-mode-buffers)
+;; 	  company-keywords
+;; 	  company-files
+;; 	  company-dabbrev)))
+
+;; (use-package company
+;;   :ensure t
+;;   :defer t
+;;   ;;:init (add-hook 'after-init-hook 'global-company-mode)
+;;   :config
+;;   (global-company-mode 1)
+;;   (setq company-idle-delay 0.0
+;; 	company-minimum-prefix-length 1
+;; 	company-selection-wrap-around t
+;; 	company-show-numbers t
+;; 	company-tooltip-limit 12
+;; 	)
+;;   (setq company-tooltip-minimum-width 60)
+;;   (setq company-tooltip-margin 60)
+;;   (setq company-tooltip-align-annotations t)
+;;   :bind
+;;   (:map company-active-map
+;; 	("C-n" . company-select-next)
+;; 	("C-p" . company-select-previous)
+;; 	("M-<" . company-select-first)
+;; 	("M->" . company-select-last)
+;; 	("C-;" . company-complete-common)))
+
+;; (use-package company-box
+;;   :hook (company-mode . company-box-mode)
+;;   :config
+;;   ;; (setq company-box-backends-colors
+;;   ;; 	'(:candidate "purple" :annotation "#7C4Dff"
+;;   ;; 	  :select (:background "purple" :foreground "white")))
+;;   (setq company-box-backends-colors
+;; 	'(:candidate "white" :annotation "#7C4Dff"
+;;    	  :select (:background "green" :foreground "white")))
+;;   (add-to-list 'company-box-frame-parameters '(font . "Hack Nerd Font-16")))
+
 (use-package fish-mode
   :ensure t
 )
 
+;; counsel
+(use-package counsel
+  :ensure t
+  :defer t)
+
 ;; eglot lsp
 (use-package eglot
   :ensure t
-  :init
-  (setq eglot-events-buffer-config '(:size 0 :format short)
-	eglot-ignored-server-capabilities '(:documentHighlightProvider)
-	eglot-send-changes-idle-time 1.0)
   :config
   (add-to-list 'eglot-server-programs '(c-mode . ("clangd")))
   (add-to-list 'eglot-server-programs '(c++-mode . ("clangd")))
@@ -799,15 +530,6 @@
   ;; (add-hook 'python-mode-hook '(lambda() (add-hook 'before-save-hook 'eglot-format-buffer nil t)))
   (define-key eglot-mode-map (kbd "C-c r") 'eglot-rename)
   (define-key eglot-mode-map (kbd "C-c f") 'eglot-format))
-
-(use-package eldoc-box
-  :hook (eglot-managed-mode . eldoc-box-hover-mode))
-(use-package eglot-signature-eldoc-talkative
-  :after eldoc-box
-  :config
-  (advice-add #'eglot-signature-eldoc-function
-              :override #'eglot-signature-eldoc-talkative))
-
 
 ;; zig-mode
 (use-package zig-mode
@@ -960,6 +682,14 @@
   :bind (:map markdown-mode-map
          ("C-c C-e" . markdown-do)))
 
+;; disabled 2023-09-27 18:23:24
+(use-package yasnippet
+  :ensure t
+  :init (yas-global-mode 1))
+
+;; (use-package yasnippet-snippets
+;;   :defer t
+;;   :after yasnippet)
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
@@ -969,7 +699,7 @@
  '(custom-safe-themes
    '("71c615b0a662a491a5ae8266adfbd8f75dcb0b980f5fecae9dd6494121e4e5a5" "7b8f5bbdc7c316ee62f271acf6bcd0e0b8a272fdffe908f8c920b0ba34871d98" "b40f11c174e7e475508f1e2c1cfca354d37212494c143a494f27239c7d71a294" "90a6f96a4665a6a56e36dec873a15cbedf761c51ec08dd993d6604e32dd45940" "06f0b439b62164c6f8f84fdda32b62fb50b6d00e8b01c2208e55543a6337433a" "871b064b53235facde040f6bdfa28d03d9f4b966d8ce28fb1725313731a2bcc8" "ba323a013c25b355eb9a0550541573d535831c557674c8d59b9ac6aa720c21d3" "67f6b0de6f60890db4c799b50c0670545c4234f179f03e757db5d95e99bac332" "046a2b81d13afddae309930ef85d458c4f5d278a69448e5a5261a5c78598e012" "0527c20293f587f79fc1544a2472c8171abcc0fa767074a0d3ebac74793ab117" "2cc1b50120c0d608cc5064eb187bcc22c50390eb091fddfa920bf2639112adb6" "fc608d4c9f476ad1da7f07f7d19cc392ec0fb61f77f7236f2b6b42ae95801a62" "3c3507184cd9b63d58106de248415981dac5facdd22f7266f0b820a9c18f4f5b" "b4c8beafbdaf78e2624f0e4c06b00f40f833c7c8c1d1263f2201f719cb4b4ff9" "2858c51f2d5afa229e836bc303f5c0b7c672a9905a55e947922922b146b44d73" "4dcf06273c9f5f0e01cea95e5f71c3b6ee506f192d75ffda639d737964e2e14e" "603a831e0f2e466480cdc633ba37a0b1ae3c3e9a4e90183833bc4def3421a961" "7b303763746ab4ab92fd18d911073aadb1393d36263ba1f04f5e0641e94f6d54" "3de5c795291a145452aeb961b1151e63ef1cb9565e3cdbd10521582b5fd02e9a" "443e2c3c4dd44510f0ea8247b438e834188dc1c6fb80785d83ad3628eadf9294" "3c83b3676d796422704082049fc38b6966bcad960f896669dfc21a7a37a748fa" "4b287bfbd581ea819e5d7abe139db1fb5ba71ab945cec438c48722bea3ed6689" "adaf421037f4ae6725aa9f5654a2ed49e2cd2765f71e19a7d26a454491b486eb" "1b8d67b43ff1723960eb5e0cba512a2c7a2ad544ddb2533a90101fd1852b426e" "bb08c73af94ee74453c90422485b29e5643b73b05e8de029a6909af6a3fb3f58" "72ed8b6bffe0bfa8d097810649fd57d2b598deef47c992920aef8b5d9599eefe" "628278136f88aa1a151bb2d6c8a86bf2b7631fbea5f0f76cba2a0079cd910f7d" default))
  '(package-selected-packages
-   '(org-modern ox-qmd org-pomodoro ef-themes eglot-signature-eldoc-talkative eldoc-box eglot-tempel consult-eglot imenu-list dashboard undo-fu-session undo-fu tempel-collection tempel embark-consult embark marginalia corfu-prescient vertico-prescient prescient orderless vertico corfu-terminal corfu nerd-icons-dired nerd-icons-completion auto-package-update highlight-indent-guides volatile-highlights beacon doom-modeline mini-echo moody company-anywhere company-statistics zig-mode markdown-mode geiser-guile rust-mode smartparens vscode-dark-plus-theme catppuccin-theme ace-window modus-themes unicode-fonts fish-mode evil-collection editorconfig smart-mode-line-powerline-theme tuareg magit-todos dired tree-sitter-langs tree-sitter cargo-mode rainbow-delimiters hl-todo magit-gitflow arjen-grey-theme exec-path-frome-shell counsel rainbow-mode visual-fill-column virtual-fill-column elpy smart-mode-line-atom-one-dark-theme smart-mode-line smart-jump auto-sudoedit cl-libify lsp-ivy lsp-ui lsp-mode eglot-java kotlin-mode python-mode doom-themes magit sanityinc-tomorrow-day solarized-theme material-theme color-theme-sanityinc-tomorrow key-chord organic-green-theme undo-tree everforest-theme everforest powerline-evil powerline evil vterm cl clang-format monokai-pro-theme nix-mode darkokai-theme darkokai gruvbox-theme yasnippet-snippets yasnippet tide typescript-mode all-the-icons-dired all-the-icons-ibuffer gcmh move-text zenburn-theme darcula-theme darcula zenburn exec-path-from-shell company-box python-black go-mode dracula-theme which-key try use-package))
+   '(highlight-indent-guides volatile-highlights beacon doom-modeline mini-echo moody company-anywhere company-statistics zig-mode markdown-mode geiser-guile rust-mode smartparens vscode-dark-plus-theme catppuccin-theme ace-window modus-themes unicode-fonts fish-mode evil-collection editorconfig smart-mode-line-powerline-theme tuareg magit-todos dired tree-sitter-langs tree-sitter cargo-mode rainbow-delimiters hl-todo magit-gitflow arjen-grey-theme exec-path-frome-shell counsel rainbow-mode visual-fill-column virtual-fill-column elpy smart-mode-line-atom-one-dark-theme smart-mode-line smart-jump auto-sudoedit cl-libify lsp-ivy lsp-ui lsp-mode eglot-java kotlin-mode python-mode doom-themes magit sanityinc-tomorrow-day solarized-theme material-theme color-theme-sanityinc-tomorrow key-chord organic-green-theme undo-tree everforest-theme everforest powerline-evil powerline evil vterm cl clang-format monokai-pro-theme nix-mode darkokai-theme darkokai gruvbox-theme yasnippet-snippets yasnippet tide typescript-mode all-the-icons-dired all-the-icons-ibuffer gcmh move-text zenburn-theme darcula-theme darcula zenburn exec-path-from-shell company-box python-black go-mode dracula-theme which-key try use-package))
  '(warning-suppress-log-types '((comp) (comp) (comp)))
  '(warning-suppress-types '((comp))))
 (custom-set-faces
