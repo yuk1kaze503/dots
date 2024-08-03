@@ -528,6 +528,7 @@
 ;; (set-frame-font "Sarasa Fixed J Nerd Font-22")
 (set-frame-font "ComicShannsMono Nerd Font-22")
 ;;(set-frame-font "Cica-24")
+
 (use-package ef-themes
   :config
   (setq ef-themes-mixed-fonts t
@@ -535,10 +536,27 @@
   (load-theme 'ef-melissa-light t))
 
 (use-package modus-themes
-  :ensure t
   :config
-  ;; (load-theme 'modus-operandi t) ;; Light theme
-  ;;(load-theme 'modus-vivendi t)  ;; Dark theme
+  (setq modus-themes-italic-constructs t
+        modus-themes-bold-constructs nil
+        modus-themes-mixed-fonts t
+        modus-themes-variable-pitch-ui t
+        modus-themes-disable-other-themes t)
+
+  (setq modus-themes-completions
+        '((t . (underline))))
+
+  (setq modus-themes-common-palette-overrides
+        '((fg-completion-match-0 blue)
+          (fg-completion-match-1 magenta-warmer)
+          (fg-completion-match-2 cyan)
+          (fg-completion-match-3 red)
+          (bg-completion-match-0 bg-blue-nuanced)
+          (bg-completion-match-1 bg-magenta-nuanced)
+          (bg-completion-match-2 bg-cyan-nuanced)
+          (bg-completion-match-3 bg-red-nuanced)))
+
+  ;; (load-theme 'modus-operandi-tinted t)
   )
 
 (use-package catppuccin-theme
@@ -573,36 +591,6 @@
   :ensure t
   :config
   (unicode-fonts-setup))
-
-;; ;; ivy-mode
-;; (use-package ivy
-;;   :ensure t
-;;   :config
-;;   (ivy-mode 1)
-;;   (setq ivy-use-virtual-buffers t)
-;;   (setq ivy-use-selectable-prompt t)
-;;   (setq enable-recursive-minibuffers t))
-
-;; ;; swipe
-;; (use-package swiper
-;;   :ensure t
-;;   :bind
-;;   ("C-s" . swiper))
-
-;; ;; smartparens
-;; (use-package smartparens
-;;   :ensure t
-;;   :config
-;;   (sp-with-modes 'rust-mode
-;;     (sp-local-pair "'" nil :actions nil))
-;;   (smartparens-global-mode t))
-;; (setq electric-pair-open-newline-between-pairs t)
-;; (electric-indent-mode 1)
-
-;; ;; ido mode
-;; (setq indo-enable-flex-matching t)
-;; (setq ido-everywhere t)
-;; (ido-mode 1)
 
 ;; magit
 (use-package magit
