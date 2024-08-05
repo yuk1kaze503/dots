@@ -43,7 +43,7 @@
     ;; and smaller 80 column windows for smaller displays
     ;; pick whatever numbers make sense for you
     (if (> (x-display-pixel-width) 1280)
-           (add-to-list 'default-frame-alist (cons 'width 180))
+           (add-to-list 'default-frame-alist (cons 'width 120))
            (add-to-list 'default-frame-alist (cons 'width 50)))
     ;; for the height, subtract a couple hundred pixels
     ;; from the screen height (for panels, menubars and
@@ -711,9 +711,7 @@
   :ensure t)
 
 ;; ;; evil-mode
-;; trying agian 2023-04-19 11:43:16
-;; failed. 2023-04-21 09:00:34
-;; 2023-11-20 
+;; NOTE: evil vs meow 2023-11-20 
 (use-package evil
   :ensure t
   :init
@@ -825,15 +823,15 @@
 ;; spell checking
 (use-package flyspell
   :config
-  (add-hook 'c-mode-hook '(lambda()
+  (add-hook 'c-mode-hook #'(lambda()
 			    (flyspell-prog-mode)))
-  (add-hook 'c++-mode-hook '(lambda()
+  (add-hook 'c++-mode-hook #'(lambda()
 			      (flyspell-prog-mode)))
-  (add-hook 'go-mode-hook '(lambda()
+  (add-hook 'go-mode-hook #'(lambda()
 			     (flyspell-prog-mode)))
-  (add-hook 'rust-mode-hook '(lambda()
+  (add-hook 'rust-mode-hook #'(lambda()
 				 (flyspell-prog-mode)))
-  (add-hook 'python-mode-hook '(lambda()
+  (add-hook 'python-mode-hook #'(lambda()
 				 (flyspell-prog-mode))))
 
 
@@ -889,7 +887,7 @@
   (when (featurep 'eglot)
     (lsp-snippet-tempel-eglot-init)))
 
-;; eglot boost (maybe works?)
+;; eglot boost (works?)
 ;; not working on arm mac T_T
 ;; (use-package eglot-booster
 ;;   :after eglot
@@ -1011,11 +1009,11 @@
 
 ;; auto-revert
 (use-package autorevert
-  :config
-  ;; also auto refresh dired, but be quiet about it
-  (global-auto-revert-mode t)
-  (setq global-auto-revert-non-file-buffers t)
-  (setq auto-revert-verbose nil))
+ :config
+ ;; also auto refresh dired, but be quiet about it
+ (global-auto-revert-mode t)
+ (setq global-auto-revert-non-file-buffers t)
+ (setq auto-revert-verbose nil))
 
 
 ;; ibuffer
@@ -1061,9 +1059,10 @@
   :config
   (setq dired-dwim-target t)
   (setq delete-by-moving-to-trash t)
-  (setq dired-guess-shell-alist-user `(("\\.png\\'" "gimp")
-                                       ("\\.jpe?g\\'" "gimp")
-                                       ("\\.mp4\\'" "mpv")))
+  ;; (setq dired-guess-shell-alist-user `(("\\.png\\'" "gimp")
+  ;;                                      ("\\.jpe?g\\'" "gimp")
+  ;;                                      ("\\.mp4\\'" "mpv")))
+  (define-key dired-mode-map "c" 'find-file)
   (add-hook 'dired-load-hook (lambda () (load "dired-x"))))
 
 (use-package markdown-mode
