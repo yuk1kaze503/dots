@@ -76,7 +76,6 @@
 (setq column-number-mode t)
 
 (defvar kang/indent-width 2)
-;;(setq indent-tabs-mode nil)
 (defvaralias 'c-basic-offset 'default-tab-width)
 
 ;; my lisp functions
@@ -516,6 +515,14 @@
   :demand t
   :bind (("M-+" . tempel-complete) ;; Alternative tempel-expand
          ("M-*" . tempel-insert))
+  ;; :custom
+  ;; (defun my-tempel-setup()
+  ;;   (setq-local completion-at-point-functions
+  ;;               (cons #'tempel-expand ;; exact match
+  ;;                     completion-at-point-functions)))
+  ;; :hook
+  ;; (add-hook 'prog-mode-hook 'my-tempel-setup)
+  ;; (add-hook 'text-mode-hook 'my-tempel-setup)
   :config
   (with-eval-after-load "tempel"
     (define-key tempel-map (kbd "<tab>") #'tempel-next)
