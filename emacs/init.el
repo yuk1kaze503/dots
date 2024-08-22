@@ -285,6 +285,14 @@
   :init
   (global-corfu-mode))
 
+(use-package tabnine
+  :demand t
+  :hook
+  (kill-emacs . tabnine-kill-process)
+  :config
+  (tabnine-start-process)
+  (global-tabnine-mode 1))
+
 (use-package cape
   ;; Bind prefix keymap providing all Cape commands under a mnemonic key.
   ;; Press C-c p ? to for help.
@@ -299,12 +307,35 @@
   ;; used by `completion-at-point'.  The order of the functions matters, the
   ;; first function returning a result wins.  Note that the list of buffer-local
   ;; completion functions takes precedence over the global list.
-  (add-hook 'completion-at-point-functions #'cape-dabbrev)
-  (add-hook 'completion-at-point-functions #'cape-file)
-  (add-hook 'completion-at-point-functions #'cape-elisp-block)
+  ;; (add-hook 'completion-at-point-functions #'cape-dabbrev)
+  ;; (add-hook 'completion-at-point-functions #'cape-file)
+  ;; (add-hook 'completion-at-point-functions #'cape-elisp-block)
   ;; (add-hook 'completion-at-point-functions #'cape-history)
-  ;; ...
-)
+  :hook
+  (((prog-mode
+     text-mode
+     conf-mode
+     ;;eglot-managed-mode
+     ) . my-capf))
+  :config
+  (setq dabbrev-friend-buffer-function (lambda (other-buffer)
+                                       (< (buffer-size other-buffer) (* 1024 1024))))
+  (defun my-capf (&optional arg)
+    (setq-local completion-at-point-functions
+                (list (cape-capf-properties
+                       (cape-capf-case-fold
+                        (cape-capf-buster
+                         (cape-capf-super
+                          (if arg
+                              arg
+                            (car completion-at-point-functions))
+                          :with
+                          #'tempel-complete
+                          #'tabnine-completion-at-point
+                          #'cape-dabbrev
+                          #'cape-file)))
+                       :sort t
+                       :exclusive 'no)))))
 
 (use-package corfu-popupinfo
   :ensure nil
@@ -320,18 +351,82 @@
   (setq corfu-prescient-enable-filtering nil)
   (corfu-prescient-mode 1))
 
-
-;;TODO: config 4 orderless
 (use-package orderless
-  :ensure t
-  :custom
-  (completion-styles '(orderless basic))
-  (completion-category-overrides '((file (styles basic partial-completion)))))
+  :config
+  (setq completion-styles '(orderless basic)
+        completion-category-defaults nil
+        completion-category-overrides nil)
+
+  (with-eval-after-load 'corfu
+    (defun orderless-fast-dispatch (word index total)
+      (and (= index 0) (= total 1) (length< word 4)
+           'orderless-literal-prefix))
+
+    (orderless-define-completion-style orderless-fast
+      (orderless-style-dispatchers '(orderless-fast-dispatch))
+      (orderless-matching-styles '(orderless-flex)))
+
+    (defun my-corfu-for-orderless ()
+      (setq-local corfu-auto-delay 0
+                  corfu-auto-prefix 1
+                  completion-styles '(orderless-fast)))
+
+    (add-hook 'corfu-mode-hook #'my-corfu-for-orderless)))
 
 (use-package prescient
   :config
   (setq prescient-aggressive-file-save t)
   (prescient-persist-mode 1))
+
+;; https://qiita.com/nobuyuki86/items/122e85b470b361ded0b4
+(use-package flx
+  :config
+  (with-eval-after-load 'prescient
+    (defvar-local my/input-query nil)
+    (defun my/store-input-query (string &rest _args)
+      "Store the current completion query in `my/input-query'."
+      (setq my/input-query (replace-regexp-in-string " " "" string)))
+    (advice-add 'completion-all-completions :before #'my/store-input-query)
+
+    (defvar vertico--total nil)
+    (defvar corfu--total nil)
+
+    ;; cache
+    (defvar my/flx-cache (make-hash-table :test 'equal :size 1000))
+
+    (defun my/get-flx-score (str query)
+      (or (gethash (cons str query) my/flx-cache)
+          (let ((score (condition-case nil
+                           (car (flx-score str query flx-file-cache))
+                         (error nil))))
+            (puthash (cons str query) score my/flx-cache)
+            score)))
+
+    (defun my/flx-tiebreaker (c1 c2)
+      (let ((total (or vertico--total corfu--total 0))
+            (query-length (length my/input-query)))
+        (if (and (< total 3000)
+                 (> query-length 2)
+                 (< (length c1) 100)
+                 (< (length c2) 100))
+            (let ((score1 (my/get-flx-score c1 my/input-query))
+                  (score2 (my/get-flx-score c2 my/input-query)))
+              (cond ((and (integerp score1) (integerp score2))
+                     (cond ((> score1 score2) -1)
+                           ((< score1 score2) 1)
+                           (t (- (length c1) (length c2)))))
+                    (t 0)))
+          (- (length c1) (length c2)))))
+
+    (setq prescient-tiebreaker #'my/flx-tiebreaker)
+
+    (defun my/clear-flx-cache ()
+      (clrhash my/flx-cache))
+
+    ;; clear cache per hour 
+    (defvar my/flx-cache-timer nil)
+    (setq my/flx-cache-timer
+          (run-with-timer 3600 3600 #'my/clear-flx-cache))))
 
 
 ;; vertico repalce helm & ivy
@@ -499,7 +594,7 @@
   ;; For some commands and buffer sources it is useful to configure the
   ;; :preview-key on a per-command basis using the `consult-customize' macro.
   (consult-customize
-   consult-theme :preview-key '(:debounce 0.2 any)
+   consult-theme :preview-key '(:debounce 1.0 any)
    consult-ripgrep consult-git-grep consult-grep
    consult-bookmark consult-recent-file consult-xref
    consult--source-bookmark consult--source-file-register
@@ -520,6 +615,9 @@
   :after eglot
   :bind ( :map eglot-mode-map
           ("C-c s" . consult-eglot-symbols)))
+
+(use-package symbol-overlay
+  :hook (prog-mode . symbol-overlay-mode))
 
 ;; NOTE: disabled 06-08-2024 retry 07-08-2024
 (use-package highlight-indent-guides
@@ -587,6 +685,9 @@
   (setq undo-tree-auto-save-history nil)
   (evil-set-undo-system 'undo-tree)
   (global-undo-tree-mode 1))
+(use-package vundo
+  :ensure t
+  )
 
 (use-package dashboard
   :config
@@ -876,10 +977,10 @@
   (add-to-list 'eglot-server-programs '(c-mode . ("clangd")))
   (add-to-list 'eglot-server-programs '(c++-mode . ("clangd")))
   (add-to-list 'eglot-server-programs '(go-mode . ("gopls")))
-  ;; (add-to-list 'eglot-server-programs
-  ;;              '((rust-mode rust-ts-mode) .
-  ;;                 ("rust-analyzer" :initializationOptions (:check
-  ;;                                    (:command "clippy")))))
+  (add-to-list 'eglot-server-programs
+               '((rust-mode rust-ts-mode) .
+                  ("rust-analyzer" :initializationOptions (:check
+                                     (:command "clippy")))))
   (add-to-list 'eglot-server-programs '(python-mode . ("pylsp"))) ;; python-lsp-server
   (add-to-list 'eglot-server-programs '(kotlin-mode . ("kotlin-language-server")))
   (add-to-list 'eglot-server-programs '(java-mode . ("java-language-server")))
@@ -888,7 +989,7 @@
   (add-hook 'c-mode-hook 'eglot-ensure)
   (add-hook 'c++-mode-hook 'eglot-ensure)
   (add-hook 'go-mode-hook 'eglot-ensure)
-  ;; (add-hook 'rust-mode-hook 'eglot-ensure)
+  (add-hook 'rust-mode-hook 'eglot-ensure)
   (add-hook 'python-mode-hook 'eglot-ensure)
   (add-hook 'java-mode-hook 'eglot-ensure)
   (add-hook 'kotlin-mode-hook 'eglot-ensure)
@@ -918,12 +1019,15 @@
     (lsp-snippet-tempel-eglot-init)))
 
 ;; eglot boost (works?)
-;; not working on arm mac T_T
-;; (use-package eglot-booster
-;;   :after eglot
-;;   :vc ( :fetcher github :repo "jdtsmith/eglot-booster")
-;;   :config
-;;   (eglot-booster-mode 1))
+;; not working on arm mac T_T (fixed 22-08-24)
+;; https://github.com/blahgeek/emacs-lsp-booster
+;; build by binary
+;; ~/usr/local/bin
+(use-package eglot-booster
+  :after eglot
+  :vc ( :fetcher github :repo "jdtsmith/eglot-booster")
+  :config
+  (eglot-booster-mode 1))
 
 (use-package eldoc-box
   :hook (eglot-managed-mode . eldoc-box-hover-mode))
@@ -1044,15 +1148,6 @@
   :init
   (setq sqlformat-command "sqlfluff"))
 
-;; NOTE: useless
-;; ;; move text
-;; (use-package move-text
-;;   :ensure t
-;;   :config
-;;   (global-set-key (kbd "M-p") 'move-text-up)
-;;   (global-set-key (kbd "M-n") 'move-text-down))
-
-
 ;; auto-revert
 (use-package autorevert
  :config
@@ -1128,9 +1223,10 @@
  '(custom-safe-themes
    '("6b839977baf10a65d9d7aed6076712aa2c97145f45abfa3bad1de9d85bc62a0e" "ba430032923a577f4b6d9affd8c03553e13599aa7a33460e00f594b8693115bf" "dcb1cc804b9adca583e4e65755895ba0a66ef82d29464cf89a78b88ddac6ca53" "71c615b0a662a491a5ae8266adfbd8f75dcb0b980f5fecae9dd6494121e4e5a5" "7b8f5bbdc7c316ee62f271acf6bcd0e0b8a272fdffe908f8c920b0ba34871d98" "b40f11c174e7e475508f1e2c1cfca354d37212494c143a494f27239c7d71a294" "90a6f96a4665a6a56e36dec873a15cbedf761c51ec08dd993d6604e32dd45940" "06f0b439b62164c6f8f84fdda32b62fb50b6d00e8b01c2208e55543a6337433a" "871b064b53235facde040f6bdfa28d03d9f4b966d8ce28fb1725313731a2bcc8" "ba323a013c25b355eb9a0550541573d535831c557674c8d59b9ac6aa720c21d3" "67f6b0de6f60890db4c799b50c0670545c4234f179f03e757db5d95e99bac332" "046a2b81d13afddae309930ef85d458c4f5d278a69448e5a5261a5c78598e012" "0527c20293f587f79fc1544a2472c8171abcc0fa767074a0d3ebac74793ab117" "2cc1b50120c0d608cc5064eb187bcc22c50390eb091fddfa920bf2639112adb6" "fc608d4c9f476ad1da7f07f7d19cc392ec0fb61f77f7236f2b6b42ae95801a62" "3c3507184cd9b63d58106de248415981dac5facdd22f7266f0b820a9c18f4f5b" "b4c8beafbdaf78e2624f0e4c06b00f40f833c7c8c1d1263f2201f719cb4b4ff9" "2858c51f2d5afa229e836bc303f5c0b7c672a9905a55e947922922b146b44d73" "4dcf06273c9f5f0e01cea95e5f71c3b6ee506f192d75ffda639d737964e2e14e" "603a831e0f2e466480cdc633ba37a0b1ae3c3e9a4e90183833bc4def3421a961" "7b303763746ab4ab92fd18d911073aadb1393d36263ba1f04f5e0641e94f6d54" "3de5c795291a145452aeb961b1151e63ef1cb9565e3cdbd10521582b5fd02e9a" "443e2c3c4dd44510f0ea8247b438e834188dc1c6fb80785d83ad3628eadf9294" "3c83b3676d796422704082049fc38b6966bcad960f896669dfc21a7a37a748fa" "4b287bfbd581ea819e5d7abe139db1fb5ba71ab945cec438c48722bea3ed6689" "adaf421037f4ae6725aa9f5654a2ed49e2cd2765f71e19a7d26a454491b486eb" "1b8d67b43ff1723960eb5e0cba512a2c7a2ad544ddb2533a90101fd1852b426e" "bb08c73af94ee74453c90422485b29e5643b73b05e8de029a6909af6a3fb3f58" "72ed8b6bffe0bfa8d097810649fd57d2b598deef47c992920aef8b5d9599eefe" "628278136f88aa1a151bb2d6c8a86bf2b7631fbea5f0f76cba2a0079cd910f7d" default))
  '(package-selected-packages
-   '(rustic cargo flymake-collection cape auto-dark fontaine sqlformat sql-indent highlight-quoted highlight-defined lsp-snippet eglot-x lin treesit-auto puni rg difftastic diff-hl vertico-truncate nerd-icons-corfu org-modern-indent vc-use-package org-modern ox-qmd org-pomodoro ef-themes eglot-signature-eldoc-talkative eldoc-box eglot-tempel consult-eglot imenu-list dashboard undo-fu-session undo-fu tempel-collection tempel embark-consult embark marginalia corfu-prescient vertico-prescient prescient orderless vertico corfu-terminal corfu nerd-icons-dired nerd-icons-completion auto-package-update highlight-indent-guides volatile-highlights beacon doom-modeline mini-echo moody company-anywhere company-statistics zig-mode markdown-mode geiser-guile rust-mode smartparens vscode-dark-plus-theme catppuccin-theme ace-window modus-themes unicode-fonts fish-mode evil-collection editorconfig smart-mode-line-powerline-theme tuareg magit-todos dired tree-sitter-langs tree-sitter cargo-mode rainbow-delimiters hl-todo magit-gitflow arjen-grey-theme exec-path-frome-shell counsel rainbow-mode visual-fill-column virtual-fill-column elpy smart-mode-line-atom-one-dark-theme smart-mode-line smart-jump auto-sudoedit cl-libify lsp-ivy lsp-ui lsp-mode eglot-java kotlin-mode python-mode doom-themes magit sanityinc-tomorrow-day solarized-theme material-theme color-theme-sanityinc-tomorrow key-chord organic-green-theme undo-tree everforest-theme everforest powerline-evil powerline evil vterm cl clang-format monokai-pro-theme nix-mode darkokai-theme darkokai gruvbox-theme yasnippet-snippets yasnippet tide typescript-mode all-the-icons-dired all-the-icons-ibuffer gcmh move-text zenburn-theme darcula-theme darcula zenburn exec-path-from-shell company-box python-black go-mode dracula-theme which-key try use-package))
+   '(symbol-overlay vundo flx eglot-booster tabnine rustic cargo flymake-collection cape auto-dark fontaine sqlformat sql-indent highlight-quoted highlight-defined lsp-snippet eglot-x lin treesit-auto puni rg difftastic diff-hl vertico-truncate nerd-icons-corfu org-modern-indent vc-use-package org-modern ox-qmd org-pomodoro ef-themes eglot-signature-eldoc-talkative eldoc-box eglot-tempel consult-eglot imenu-list dashboard undo-fu-session undo-fu tempel-collection tempel embark-consult embark marginalia corfu-prescient vertico-prescient prescient orderless vertico corfu-terminal corfu nerd-icons-dired nerd-icons-completion auto-package-update highlight-indent-guides volatile-highlights beacon doom-modeline mini-echo moody company-anywhere company-statistics zig-mode markdown-mode geiser-guile rust-mode smartparens vscode-dark-plus-theme catppuccin-theme ace-window modus-themes unicode-fonts fish-mode evil-collection editorconfig smart-mode-line-powerline-theme tuareg magit-todos dired tree-sitter-langs tree-sitter cargo-mode rainbow-delimiters hl-todo magit-gitflow arjen-grey-theme exec-path-frome-shell counsel rainbow-mode visual-fill-column virtual-fill-column elpy smart-mode-line-atom-one-dark-theme smart-mode-line smart-jump auto-sudoedit cl-libify lsp-ivy lsp-ui lsp-mode eglot-java kotlin-mode python-mode doom-themes magit sanityinc-tomorrow-day solarized-theme material-theme color-theme-sanityinc-tomorrow key-chord organic-green-theme undo-tree everforest-theme everforest powerline-evil powerline evil vterm cl clang-format monokai-pro-theme nix-mode darkokai-theme darkokai gruvbox-theme yasnippet-snippets yasnippet tide typescript-mode all-the-icons-dired all-the-icons-ibuffer gcmh move-text zenburn-theme darcula-theme darcula zenburn exec-path-from-shell company-box python-black go-mode dracula-theme which-key try use-package))
  '(package-vc-selected-packages
-   '((lsp-snippet :vc-backend Git :url "https://github.com/svaante/lsp-snippet")
+   '((eglot-booster :vc-backend Git :url "https://github.com/jdtsmith/eglot-booster")
+     (lsp-snippet :vc-backend Git :url "https://github.com/svaante/lsp-snippet")
      (eglot-x :vc-backend Git :url "https://github.com/nemethf/eglot-x")
      (vertico-truncate :vc-backend Git :url "https://github.com/jdtsmith/vertico-truncate")
      (nerd-icons-corfu :vc-backend Git :url "https://github.com/LuigiPiucco/nerd-icons-corfu")
