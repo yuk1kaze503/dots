@@ -29,7 +29,8 @@
 (defconst IS-WINDOWS (memq system-type '(cygwin windows-nt ms-dos)))
 
 ;; ;; for mac to run shell env
-(when (memq window-system '(mac ns x))
+;; ;; fo darwin not [memq] using [eq]
+(when (eq window-system '(mac ns x))
   (progn (exec-path-from-shell-initialize)
 ;; ;; set meta key to command
 (setq mac-command-modifier 'meta)))
