@@ -1,5 +1,3 @@
-;; TODO: emigrate to 30.1
-;; TODO: delete old functions.
 ;; default settings
 (setq byte-compile-warnings '(cl-functions))
 (setq debug-on-error t)
