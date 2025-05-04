@@ -1,5 +1,6 @@
-;; TODO: emigrate to 30.1
-;; TODO: delete old functions.
+;;; updated 04-05-25
+;;; deleted old functions && pacakges
+;;; (use-package) -> (vc-use-package) built-ins from 30.1
 ;; default settings
 (setq byte-compile-warnings '(cl-functions))
 (setq debug-on-error t)
@@ -20,22 +21,11 @@
 ;; message log
 (setq message-log-max 5000)
 
-;; 4 lsp performance
-;; added at eglot init 03-08-2024
-;; (setq read-process-output-max (* 2 1024 1024))
-;; (setq gc-cons-threshold 100000000)
-
 ;; defconst 4 os-type
 (defconst IS-MAC (eq system-type 'darwin))
 (defconst IS-LINUX (memq system-type '(gnu gnu/linux gnu/kfreebsd berkeley-unix)))
 (defconst IS-WINDOWS (memq system-type '(cygwin windows-nt ms-dos)))
 
-;; ;; for mac to run shell env
-;; ;; fo darwin not [memq] using [eq]
-(when (eq window-system '(mac ns x))
-  (progn (exec-path-from-shell-initialize)
-;; ;; set meta key to command
-(setq mac-command-modifier 'meta)))
 
 ;; frame-size
 (defun set-frame-size-according-to-resolution ()
@@ -80,6 +70,7 @@
 
 (defvar kang/indent-width 2)
 (defvaralias 'c-basic-offset 'default-tab-width)
+(setq-default indent-tabs-mode nil)
 
 ;; my lisp functions
 
@@ -118,17 +109,6 @@
   (package-install 'use-package))
 (eval-and-compile
   (setq use-package-always-ensure t))
-;; compose use-package and vc-use-package
-(unless (package-installed-p 'vc-use-package)
-  (package-vc-install "https://github.com/slotThe/vc-use-package"))
-(require 'vc-use-package)
-
-;; auto package update
-(use-package auto-package-update
-  :config
-  (setq auto-package-update-interval 120)
-  (setq auto-package-update-delete-old-versions t)
-  (auto-package-update-maybe))
 
 ;; auto-save-visited
 (use-package files
@@ -137,11 +117,6 @@
   (setq auto-save-visited-interval 30)
   (auto-save-visited-mode 1))
 
-;; indent -> space
-(use-package simple
-  :ensure nil
-  :init
-  (setq-default indent-tabs-mode nil))
 
 ;; emacsclient
 (use-package server
@@ -210,9 +185,10 @@
   :after org)
 
 (use-package ox-qmd
-  :defer t) ;; C-c C-e for export org to markdown
+  :defer t) ;; C-c C-e 4 export org to markdown
 
 (use-package org-modern
+  :ensure t
   :after org
   :init
   (setq
@@ -237,14 +213,17 @@
      " ┄┄┄┄┄ " "┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄")
    org-agenda-current-time-string
    "⭠ now ─────────────────────────────────────────────────")
-
+  :custom
+  (org-modern-hide-stars nil)
+  (org-modern-table nil)
+  (org-modern-list
+   '(;; (?- . "-")
+     (?* . "•")
+     (?+ . "‣")))
+  :hook
+  (org-agenda-finalize . org-modern-agenda)
   :config
   (global-org-modern-mode 1))
-
-(use-package org-modern-indent
-  :vc ( :fetcher github :repo "jdtsmith/org-modern-indent")
-  :config
-  (add-hook 'org-mode-hook #'org-modern-indent-mode 90))
 
 
 ;; icons
@@ -255,7 +234,6 @@
   :hook (dired-mode . nerd-icons-dired-mode))
 
 (use-package nerd-icons-corfu
-  :vc ( :fetcher github :repo "LuigiPiucco/nerd-icons-corfu")
   :after corfu nerd-icons
   :config
   (add-to-list 'corfu-margin-formatters #'nerd-icons-corfu-formatter))
@@ -286,15 +264,16 @@
   ;; be used globally (M-/).  See also the customization variable
   ;; `global-corfu-modes' to exclude certain modes.
   :init
-  (global-corfu-mode))
+  (global-corfu-mode 1))
 
-(use-package tabnine
-  :demand t
-  :hook
-  (kill-emacs . tabnine-kill-process)
-  :config
-  (tabnine-start-process)
-  (global-tabnine-mode 1))
+;; disabled 04-05-25
+;; (use-package tabnine
+;;   :demand t
+;;   :hook
+;;   (kill-emacs . tabnine-kill-process)
+;;   :config
+;;   (tabnine-start-process)
+;;   (global-tabnine-mode 1))
 
 (use-package cape
   ;; Bind prefix keymap providing all Cape commands under a mnemonic key.
@@ -334,7 +313,7 @@
                             (car completion-at-point-functions))
                           :with
                           #'tempel-complete
-                          #'tabnine-completion-at-point
+                          ;; #'tabnine-completion-at-point
                           #'cape-dabbrev
                           #'cape-file)))
                        :sort t
@@ -381,67 +360,11 @@
   (setq prescient-aggressive-file-save t)
   (prescient-persist-mode 1))
 
-;; https://qiita.com/nobuyuki86/items/122e85b470b361ded0b4
-(use-package flx
-  :config
-  (with-eval-after-load 'prescient
-    (defvar-local my/input-query nil)
-    (defun my/store-input-query (string &rest _args)
-      "Store the current completion query in `my/input-query'."
-      (setq my/input-query (replace-regexp-in-string " " "" string)))
-    (advice-add 'completion-all-completions :before #'my/store-input-query)
-
-    (defvar vertico--total nil)
-    (defvar corfu--total nil)
-
-    ;; cache
-    (defvar my/flx-cache (make-hash-table :test 'equal :size 1000))
-
-    (defun my/get-flx-score (str query)
-      (or (gethash (cons str query) my/flx-cache)
-          (let ((score (condition-case nil
-                           (car (flx-score str query flx-file-cache))
-                         (error nil))))
-            (puthash (cons str query) score my/flx-cache)
-            score)))
-
-    (defun my/flx-tiebreaker (c1 c2)
-      (let ((total (or vertico--total corfu--total 0))
-            (query-length (length my/input-query)))
-        (if (and (< total 3000)
-                 (> query-length 2)
-                 (< (length c1) 100)
-                 (< (length c2) 100))
-            (let ((score1 (my/get-flx-score c1 my/input-query))
-                  (score2 (my/get-flx-score c2 my/input-query)))
-              (cond ((and (integerp score1) (integerp score2))
-                     (cond ((> score1 score2) -1)
-                           ((< score1 score2) 1)
-                           (t (- (length c1) (length c2)))))
-                    (t 0)))
-          (- (length c1) (length c2)))))
-
-    (setq prescient-tiebreaker #'my/flx-tiebreaker)
-
-    (defun my/clear-flx-cache ()
-      (clrhash my/flx-cache))
-
-    ;; clear cache per hour 
-    (defvar my/flx-cache-timer nil)
-    (setq my/flx-cache-timer
-          (run-with-timer 3600 3600 #'my/clear-flx-cache))))
-
-
 ;; vertico repalce helm & ivy
 (use-package vertico
   :init
   (setq vertico-cycle t)
   (vertico-mode 1))
-;; TODO: set evil key for vertico-repeat
-;; (use-package vertico-repeat
-;;   :ensure nil
-;;   :after vertico
-;;   :hook (minibuffer-setup . vertico-repeat-save))
 
 (use-package vertico-directory
   :ensure nil
@@ -459,11 +382,6 @@
   :config
   (setq vertico-prescient-enable-filtering nil)
   (vertico-prescient-mode 1))
-
-(use-package vertico-truncate
-  :vc ( :fetcher github :repo "jdtsmith/vertico-truncate")
-  :config
-  (vertico-truncate-mode 1))
 
 
 (use-package marginalia
@@ -487,27 +405,6 @@
 (use-package embark-consult
   :hook (embark-collect-mode . consult-preview-at-point-mode))
 
-
-;; A few more useful configurations...
-(use-package emacs
-  :custom
-  ;; TAB cycle if there are only few candidates
-  ;; (completion-cycle-threshold 3)
-
-  ;; Enable indentation+completion using the TAB key.
-  ;; `completion-at-point' is often bound to M-TAB.
-  (tab-always-indent 'complete)
-
-  ;; Emacs 30 and newer: Disable Ispell completion function. As an alternative,
-  ;; try `cape-dict'.
-  (text-mode-ispell-word-completion nil)
-
-  ;; Emacs 28 and newer: Hide commands in M-x which do not apply to the current
-  ;; mode.  Corfu commands are hidden, since they are not used via M-x. This
-  ;; setting is useful beyond Corfu.
-  (read-extended-command-predicate #'command-completion-default-include-p))
-
-;; TODO: config consult
 ;; Example configuration for Consult
 (use-package consult
   ;; Replace bindings. Lazily loaded by `use-package'.
@@ -622,7 +519,6 @@
 (use-package symbol-overlay
   :hook (prog-mode . symbol-overlay-mode))
 
-;; NOTE: disabled 06-08-2024 retry 07-08-2024
 (use-package highlight-indent-guides
 :ensure t
 :config
@@ -659,13 +555,6 @@
 (use-package eglot-tempel
   :after (eglot tempel)
   :hook (eglot-managed-mode . eglot-tempel-mode))
-
-(use-package jsonrpc
-  :defer t
-  :config
-  (setq jsonrpc-default-request-timeout 3000)
-  (fset #'jsonrpc--log-event #'ignore))
-
 
 (use-package which-key
   :ensure t
@@ -726,14 +615,13 @@
 ;; everforest theme
 (add-to-list 'custom-theme-load-path "~/.emacs.d/everforest-theme")
 ;; (load-theme 'everforest-hard-dark t)
-(add-to-list 'custom-theme-load-path "~/.emacs.d/tokyo-night-theme")
 
 (use-package ef-themes
   :config
   (setq ef-themes-mixed-fonts t
         ef-themes-variable-pitch-ui t)
-  (load-theme 'ef-melissa-light t)
-  ;; (load-theme 'ef-melissa-dark t)
+  ;; (load-theme 'ef-melissa-light t) ;; best theme. really like this one.
+  (load-theme 'ef-melissa-dark t)
   ;; (load-theme 'ef-spring t)
   ;; (load-theme 'ef-dream t)
   )
@@ -782,12 +670,6 @@
   :ensure t
   :config
   ;;(load-theme 'gruvbox-dark-soft t)
-  )
-
-(use-package color-theme-sanityinc-tomorrow
-  :ensure t
-  :config
-  ;;(load-theme 'color-theme-sanityinc-tomorrow-night t)
   )
 
 (use-package unicode-fonts
@@ -852,7 +734,6 @@
   :ensure t)
 
 ;; ;; evil-mode
-;; NOTE: evil vs meow 2023-11-20 
 (use-package evil
   :ensure t
   :init
@@ -870,7 +751,7 @@
   :config
   (setq key-chord-two-keys-delay 0.5)
   (key-chord-mode 1)
-  (key-chord-define evil-insert-state-map "jh" 'evil-normal-state)
+  (key-chord-define evil-insert-state-map "jk" 'evil-normal-state)
   )
 
 (use-package evil-collection
@@ -907,7 +788,7 @@
 ;; high light line mode
 (use-package lin
   :init
-  (setq lin-face 'lin-red)
+  (setq lin-face 'lin-mac)
   (lin-global-mode 1))
 
 (use-package puni
@@ -939,10 +820,10 @@
   :ensure t
   :defer t
   :config
-  (when (memq window-system '(mac ns))
+  (when (eq window-system '(mac ns))
     (exec-path-from-shell-initialize)))
 ;; for mac
-(when (memq window-system '(mac ns))
+(when (eq window-system '(mac ns))
 	    (setq mac-command-modifier 'meta))
 
 
@@ -1010,27 +891,30 @@
   (define-key eglot-mode-map (kbd "C-c f") 'eglot-format))
 
 (use-package eglot-x
-  :vc ( :fetcher github :repo "nemethf/eglot-x")
+  ;; :vc ( :fetcher github :repo "nemethf/eglot-x")
+  :vc (eglot-x :url "https://github.com/nemethf/eglot-x"
+               :branch "main")
   :after eglot
   :config
   (eglot-x-setup))
 
 (use-package lsp-snippet
-  :vc ( :fetcher github :repo "svaante/lsp-snippet")
+  ;; :vc ( :fetcher github :repo "svaante/lsp-snippet")
+  :vc (lsp-snippet :url "https://github.com/svaante/lsp-snippet"
+                   :branch "main")
   :config
   (when (featurep 'eglot)
     (lsp-snippet-tempel-eglot-init)))
 
-;; eglot boost (works?)
-;; not working on arm mac T_T (fixed 22-08-24)
-;; https://github.com/blahgeek/emacs-lsp-booster
-;; build by binary
+;; eglot boost 
+;; build by binary (arm mac)
 ;; ~/usr/local/bin
-(use-package eglot-booster
-  :after eglot
-  :vc ( :fetcher github :repo "jdtsmith/eglot-booster")
-  :config
-  (eglot-booster-mode 1))
+;; disabled 04-05-25 (emacs 30.1 provide more efficient JSON parser)
+;; (use-package eglot-booster
+;;   :after eglot
+;;   :vc ( :fetcher github :repo "jdtsmith/eglot-booster")
+;;   :config
+;;   (eglot-booster-mode 1))
 
 (use-package eldoc-box
   :hook (eglot-managed-mode . eldoc-box-hover-mode))
@@ -1060,15 +944,15 @@
   :config
   (add-to-list 'auto-mode-alist '("\\.go\\'" . go-mode))
   ;; (setq gofmt-command "goimports")
-  ;; (add-hook 'go-mode-hook (lambda()
-  ;;       		    (setq-default)
-  ;;       		    (setq tab-width 4)
-  ;;       		    (setq standard-indent 4)
-  ;;       		    (setq ident-tabs-mode nil)))
+  (add-hook 'go-mode-hook (lambda()
+        		    (setq-default)
+        		    (setq tab-width 4)
+        		    (setq standard-indent 4)
+        		    (setq ident-tabs-mode nil)))
   ;; (add-hook 'before-save-hook 'gofmt-before-save)
   )
 
-;; TODO: eglot not working well in rust-mode
+;; NOTE: eglot not working well in rust-mode
 ;; ;; rust-mode
 ;; (use-package rust-mode
 ;;   :ensure t
@@ -1101,8 +985,8 @@
   (setq rustic-lsp-client 'eglot)
   )
 
-
 ;; python
+;; 04-05-25 (using uv 4 python-things)
 (use-package elpy
   :ensure t
   :config
@@ -1110,12 +994,11 @@
   (setq python-indent 4)
   (setq python-shell-interpreter "ipython"
 	python-shell-interpreter-args "-i --simple-prompt"))
-
-(use-package python-black
-  :demand t
-  :after python
-  :hook (python-mode . python-black-on-save-mode-enable-dwim))
-
+;; switch to ruff from black
+(use-package ruff-format
+  :ensure t
+  :after python-mode
+  :hook (python-mode . ruff-format-on-save-mode))
 
 ;; typescript
 (use-package typescript-mode
@@ -1129,7 +1012,6 @@
   :hook ((typescript-mode . tide-setup)
 	 (typescript-mode . tide-hl-identifier-mode)
 	 (before-save . tide-format-before-save)))
-  
 
 ;; kotlin
 (use-package kotlin-mode
@@ -1170,7 +1052,6 @@
   (all-the-icons-ibuffer-mode 1))
 (use-package ibuffer
   :config
-					; (setq ibuffer-default-sorting-mode 'major-mode)
   (setq ibuffer-expert t)
   (setq ibuffer-display-summary nil)
   (setq ibuffer-use-header-line t)
@@ -1226,11 +1107,38 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(package-selected-packages '(eglot-booster lsp-snippet eglot-x))
+ '(package-selected-packages
+   '(ace-window all-the-icons-dired all-the-icons-ibuffer auto-package-update
+                auto-sudoedit cape catppuccin-theme clang-format
+                color-theme-sanityinc-tomorrow consult-eglot corfu-prescient
+                corfu-terminal dashboard diff-hl difftastic doom-modeline
+                dracula-theme ef-themes eglot-booster
+                eglot-signature-eldoc-talkative eglot-tempel eglot-x eldoc-box
+                elpy embark-consult evil-collection exec-path-from-shell
+                fish-mode flx flymake-collection fontaine geiser-guile go-mode
+                gruvbox-theme highlight-defined highlight-indent-guides
+                highlight-quoted imenu-list key-chord kotlin-mode lin
+                lsp-snippet magit-gitflow magit-todos marginalia modus-themes
+                nerd-icons-completion nerd-icons-corfu nerd-icons-dired nix-mode
+                orderless org-modern org-modern-indent org-pomodoro ox-qmd puni
+                python-black rainbow-delimiters rg ruff-format rustic simple
+                sql-indent sqlformat symbol-overlay tabnine tempel-collection
+                tide treesit-auto tuareg typescript-mode undo-fu undo-fu-session
+                undo-tree unicode-fonts vc-use-package vertico-prescient
+                vertico-truncate vterm vundo zig-mode))
  '(package-vc-selected-packages
-   '((vertico-truncate :vc-backend Git :url "https://github.com/jdtsmith/vertico-truncate")
-     (org-modern-indent :vc-backend Git :url "https://github.com/jdtsmith/org-modern-indent")
-     (vc-use-package :vc-backend Git :url "https://github.com/slotThe/vc-use-package"))))
+   '((eglot-booster :vc-backend Git :url
+                    "https://github.com/jdtsmith/eglot-booster")
+     (lsp-snippet :vc-backend Git :url "https://github.com/svaante/lsp-snippet")
+     (eglot-x :vc-backend Git :url "https://github.com/nemethf/eglot-x")
+     (vertico-truncate :vc-backend Git :url
+                       "https://github.com/jdtsmith/vertico-truncate")
+     (nerd-icons-corfu :vc-backend Git :url
+                       "https://github.com/LuigiPiucco/nerd-icons-corfu")
+     (org-modern-indent :vc-backend Git :url
+                        "https://github.com/jdtsmith/org-modern-indent")
+     (vc-use-package :vc-backend Git :url
+                     "https://github.com/slotThe/vc-use-package"))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
