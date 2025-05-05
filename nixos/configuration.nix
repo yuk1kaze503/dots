@@ -28,7 +28,7 @@ in
           insmode fat
           insmode search_fs_uuid
           insmode chain
-          search --fs-uuid --set=root 7C06-AAD2
+          search --fs-uuid --set=root 
           chainloader /EFI/Microsoft/Boot/bootmgfw.efi
         }
         '';
@@ -142,7 +142,7 @@ in
       firefox-esr
       kate
       google-chrome
-      emacs29
+      emacs
       neofetch
       lolcat
     #  thunderbird

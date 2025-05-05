@@ -58,6 +58,7 @@ in
     unrar
     htop
     bat
+    yazi
     stdman
     tree
     ffmpeg
@@ -66,10 +67,10 @@ in
     emacsPackages.yasnippet-snippets
     # lang
     libvterm
-    python310
-    python310Packages.ipython
-    python310Packages.pip
-    unstable.jdk21
+    python313
+    python313Packages.ipython
+    python313Packages.pip
+    jdk21
     kotlin
     chez
     unstable.nodejs
