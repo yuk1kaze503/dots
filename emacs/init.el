@@ -1,6 +1,4 @@
-;;; updated 04-05-25
-;;; deleted old functions && pacakges
-;;; (use-package) -> (vc-use-package) built-ins from 30.1
+;;; 04-05-25 ver. @@
 ;; default settings
 (setq byte-compile-warnings '(cl-functions))
 (setq debug-on-error t)
@@ -26,22 +24,17 @@
 (defconst IS-LINUX (memq system-type '(gnu gnu/linux gnu/kfreebsd berkeley-unix)))
 (defconst IS-WINDOWS (memq system-type '(cygwin windows-nt ms-dos)))
 
-
 ;; frame-size
 (defun set-frame-size-according-to-resolution ()
   (interactive)
   (if window-system
   (progn
-    ;; use 120 char wide window for largeish displays
+    ;; use 150 char wide window for largeish displays
     ;; and smaller 80 column windows for smaller displays
     ;; pick whatever numbers make sense for you
     (if (> (x-display-pixel-width) 1280)
-           (add-to-list 'default-frame-alist (cons 'width 120))
-           (add-to-list 'default-frame-alist (cons 'width 50)))
-    ;; for the height, subtract a couple hundred pixels
-    ;; from the screen height (for panels, menubars and
-    ;; whatnot), then divide by the height of a char to
-    ;; get the height we want
+           (add-to-list 'default-frame-alist (cons 'width 150))
+           (add-to-list 'default-frame-alist (cons 'width 80)))
     (add-to-list 'default-frame-alist
          (cons 'height (/ (- (x-display-pixel-height) 200)
                              (frame-char-height)))))))
@@ -255,44 +248,14 @@
   (corfu-count 16)
   (corfu-auto-prefix 1)
   (corfu-auto-delay 0)
-  ;; Enable Corfu only for certain modes. See also `global-corfu-modes'.
-  ;; :hook ((prog-mode . corfu-mode)
-  ;;        (shell-mode . corfu-mode)
-  ;;        (eshell-mode . corfu-mode))
-
-  ;; Recommended: Enable Corfu globally.  This is recommended since Dabbrev can
-  ;; be used globally (M-/).  See also the customization variable
-  ;; `global-corfu-modes' to exclude certain modes.
   :init
   (global-corfu-mode 1))
 
-;; disabled 04-05-25
-;; (use-package tabnine
-;;   :demand t
-;;   :hook
-;;   (kill-emacs . tabnine-kill-process)
-;;   :config
-;;   (tabnine-start-process)
-;;   (global-tabnine-mode 1))
 
 (use-package cape
-  ;; Bind prefix keymap providing all Cape commands under a mnemonic key.
   ;; Press C-c p ? to for help.
   :bind ("C-c p" . cape-prefix-map) ;; Alternative keys: M-p, M-+, ...
-  ;; Alternatively bind Cape commands individually.
-  ;; :bind (("C-c p d" . cape-dabbrev)
-  ;;        ("C-c p h" . cape-history)
-  ;;        ("C-c p f" . cape-file)
-  ;;        ...)
   :init
-  ;; Add to the global default value of `completion-at-point-functions' which is
-  ;; used by `completion-at-point'.  The order of the functions matters, the
-  ;; first function returning a result wins.  Note that the list of buffer-local
-  ;; completion functions takes precedence over the global list.
-  ;; (add-hook 'completion-at-point-functions #'cape-dabbrev)
-  ;; (add-hook 'completion-at-point-functions #'cape-file)
-  ;; (add-hook 'completion-at-point-functions #'cape-elisp-block)
-  ;; (add-hook 'completion-at-point-functions #'cape-history)
   :hook
   (((prog-mode
      text-mode
@@ -396,7 +359,6 @@
   (setq prefix-help-command #'embark-prefix-help-command)
 
   :config
-  ;; Hide the mode line of the Embark live/completions buffers
   (add-to-list 'display-buffer-alist
                '("\\`\\*Embark Collect \\(Live\\|Completions\\)\\*"
                  nil
@@ -405,7 +367,6 @@
 (use-package embark-consult
   :hook (embark-collect-mode . consult-preview-at-point-mode))
 
-;; Example configuration for Consult
 (use-package consult
   ;; Replace bindings. Lazily loaded by `use-package'.
   :bind (;; C-c bindings in `mode-specific-map'
@@ -461,38 +422,20 @@
          ("M-s" . consult-history)                 ;; orig. next-matching-history-element
          ("M-r" . consult-history))                ;; orig. previous-matching-history-element
 
-  ;; Enable automatic preview at point in the *Completions* buffer. This is
-  ;; relevant when you use the default completion UI.
   :hook (completion-list-mode . consult-preview-at-point-mode)
 
-  ;; The :init configuration is always executed (Not lazy)
   :init
 
-  ;; Optionally configure the register formatting. This improves the register
-  ;; preview for `consult-register', `consult-register-load',
-  ;; `consult-register-store' and the Emacs built-ins.
   (setq register-preview-delay 0.5
         register-preview-function #'consult-register-format)
 
-  ;; Optionally tweak the register preview window.
-  ;; This adds thin lines, sorting and hides the mode line of the window.
   (advice-add #'register-preview :override #'consult-register-window)
 
-  ;; Use Consult to select xref locations with preview
   (setq xref-show-xrefs-function #'consult-xref
         xref-show-definitions-function #'consult-xref)
 
-  ;; Configure other variables and modes in the :config section,
-  ;; after lazily loading the package.
   :config
 
-  ;; Optionally configure preview. The default value
-  ;; is 'any, such that any key triggers the preview.
-  ;; (setq consult-preview-key 'any)
-  ;; (setq consult-preview-key "M-.")
-  ;; (setq consult-preview-key '("S-<down>" "S-<up>"))
-  ;; For some commands and buffer sources it is useful to configure the
-  ;; :preview-key on a per-command basis using the `consult-customize' macro.
   (consult-customize
    consult-theme :preview-key '(:debounce 1.0 any)
    consult-ripgrep consult-git-grep consult-grep
@@ -502,13 +445,8 @@
    ;; :preview-key "M-."
    :preview-key '(:debounce 0.4 any))
 
-  ;; Optionally configure the narrowing key.
-  ;; Both < and C-+ work reasonably well.
   (setq consult-narrow-key "<") ;; "C-+"
 
-  ;; Optionally make narrowing help available in the minibuffer.
-  ;; You may want to use `embark-prefix-help-command' or which-key instead.
-  ;; (keymap-set consult-narrow-map (concat consult-narrow-key " ?") #'consult-narrow-help)
 )
 
 (use-package consult-eglot
@@ -523,9 +461,6 @@
 :ensure t
 :config
 (setq highlight-indent-guides-method 'character)
-;; (setq highlight-indent-guides-method 'bitmap)
-;;(setq highlight-indent-guides-responsive "stack")
-;;   ;; (set-face-background 'highlight-indent-guides-character-face "dimgray") 
    :hook
    (prog-mode . highlight-indent-guides-mode))
 
@@ -534,14 +469,6 @@
   :demand t
   :bind (("M-+" . tempel-complete) ;; Alternative tempel-expand
          ("M-*" . tempel-insert))
-  ;; :custom
-  ;; (defun my-tempel-setup()
-  ;;   (setq-local completion-at-point-functions
-  ;;               (cons #'tempel-expand ;; exact match
-  ;;                     completion-at-point-functions)))
-  ;; :hook
-  ;; (add-hook 'prog-mode-hook 'my-tempel-setup)
-  ;; (add-hook 'text-mode-hook 'my-tempel-setup)
   :config
   (with-eval-after-load "tempel"
     (define-key tempel-map (kbd "<tab>") #'tempel-next)
@@ -621,7 +548,7 @@
   (setq ef-themes-mixed-fonts t
         ef-themes-variable-pitch-ui t)
   ;; (load-theme 'ef-melissa-light t) ;; best theme. really like this one.
-  (load-theme 'ef-melissa-dark t)
+  ;; (load-theme 'ef-melissa-dark t)
   ;; (load-theme 'ef-spring t)
   ;; (load-theme 'ef-dream t)
   )
@@ -670,6 +597,7 @@
   :ensure t
   :config
   ;;(load-theme 'gruvbox-dark-soft t)
+  (load-theme 'gruvbox-light-soft t)
   )
 
 (use-package unicode-fonts
@@ -952,33 +880,22 @@
   ;; (add-hook 'before-save-hook 'gofmt-before-save)
   )
 
-;; NOTE: eglot not working well in rust-mode
-;; ;; rust-mode
-;; (use-package rust-mode
-;;   :ensure t
-;;   :init
-;;   (setq rust-mode-treesitter-derive t)
-;;   ;; :hook (rust-mode . (lambda ()
-;;   ;;                      (setq-local tab-width 4)))
-;;   :config
-;;   (add-to-list 'auto-mode-alist '("\\.rs\\'" . rust-mode))
-;;   ;; (setq rust-format-on-save t)
-;;   )
-;; (use-package cargo-mode
-;;   :ensure t
-;;   :hook
-;;   (rust-mode . cargo-minor-mode)
-;;   :config
-;;   (setq compilation-scroll-output t))
-;; (use-package cargo
-;;   :ensure t)
-;; rustic-mode
-;; 2024-08-22
+;; rust-mode
+(use-package rust-mode
+  :ensure t)
+
+(use-package cargo-mode
+:ensure t
+:hook
+(rust-mode . cargo-minor-mode)
+:config
+(setq compilation-scroll-output t))
+
 (use-package rustic
   :ensure t
+  :after (rust-mode)
   :custom
   (rustic-analyzer-command '("rustup" "run" "stable" "rust-analyzer"))
-
   :hook (rust-mode . (lambda ()
                        (setq-local tab-width 4)))
   :config
@@ -1107,9 +1024,23 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(custom-safe-themes
+   '("7b602fe4a324dc18877dde647eb6f2ff9352566ce16d0b888bfcb870d0abfd70"
+     "faf642d1511fb0cb9b8634b2070a097656bdb5d88522657370eeeb11baea4a1c"
+     "fbf73690320aa26f8daffdd1210ef234ed1b0c59f3d001f342b9c0bbf49f531c"
+     "2e7dc2838b7941ab9cabaa3b6793286e5134f583c04bde2fba2f4e20f2617cf7"
+     "71b688e7ef7c844512fa7c4de7e99e623de99a2a8b3ac3df4d02f2cd2c3215e7"
+     "d41229b2ff1e9929d0ea3b4fde9ed4c1e0775993df9d998a3cdf37f2358d386b"
+     "712dda0818312c175a60d94ba676b404fc815f8c7e6c080c9b4061596c60a1db"
+     "d5fd482fcb0fe42e849caba275a01d4925e422963d1cd165565b31d3f4189c87"
+     "75b371fce3c9e6b1482ba10c883e2fb813f2cc1c88be0b8a1099773eb78a7176"
+     "5aedf993c7220cbbe66a410334239521d8ba91e1815f6ebde59cecc2355d7757"
+     "18a1d83b4e16993189749494d75e6adb0e15452c80c431aca4a867bcc8890ca9"
+     "4c16a8be2f20a68f0b63979722676a176c4f77e2216cc8fe0ea200f597ceb22e"
+     "ffa78fc746f85d1c88a2d1691b1e37d21832e9a44a0eeee114a00816eabcdaf9" default))
  '(package-selected-packages
    '(ace-window all-the-icons-dired all-the-icons-ibuffer auto-package-update
-                auto-sudoedit cape catppuccin-theme clang-format
+                auto-sudoedit cape cargo-mode catppuccin-theme clang-format
                 color-theme-sanityinc-tomorrow consult-eglot corfu-prescient
                 corfu-terminal dashboard diff-hl difftastic doom-modeline
                 dracula-theme ef-themes eglot-booster
