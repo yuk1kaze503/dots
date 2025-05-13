@@ -20,25 +20,25 @@
 (setq message-log-max 5000)
 
 ;; defconst 4 os-type
-(defconst IS-MAC (eq system-type 'darwin))
-(defconst IS-LINUX (memq system-type '(gnu gnu/linux gnu/kfreebsd berkeley-unix)))
-(defconst IS-WINDOWS (memq system-type '(cygwin windows-nt ms-dos)))
+;;(defconst IS-MAC (eq system-type 'darwin))
+;;(defconst IS-LINUX (memq system-type '(gnu gnu/linux gnu/kfreebsd berkeley-unix)))
+;;(defconst IS-WINDOWS (memq system-type '(cygwin windows-nt ms-dos)))
 
 ;; frame-size
-(defun set-frame-size-according-to-resolution ()
-  (interactive)
-  (if window-system
-  (progn
-    ;; use 150 char wide window for largeish displays
-    ;; and smaller 80 column windows for smaller displays
-    ;; pick whatever numbers make sense for you
-    (if (> (x-display-pixel-width) 1280)
-           (add-to-list 'default-frame-alist (cons 'width 150))
-           (add-to-list 'default-frame-alist (cons 'width 80)))
-    (add-to-list 'default-frame-alist
-         (cons 'height (/ (- (x-display-pixel-height) 200)
-                             (frame-char-height)))))))
-(set-frame-size-according-to-resolution)
+;;(defun set-frame-size-according-to-resolution ()
+;;  (interactive)
+;;  (if window-system
+;;  (progn
+;;    ;; use 150 char wide window for largeish displays
+;;    ;; and smaller 80 column windows for smaller displays
+;;    ;; pick whatever numbers make sense for you
+;;    (if (> (x-display-pixel-width) 1280)
+;;           (add-to-list 'default-frame-alist (cons 'width 150))
+;;           (add-to-list 'default-frame-alist (cons 'width 80)))
+;;    (add-to-list 'default-frame-alist
+;;         (cons 'height (/ (- (x-display-pixel-height) 200)
+;;                             (frame-char-height)))))))
+;;(set-frame-size-according-to-resolution)
 
 ;; encoding
 (set-language-environment 'utf-8)
@@ -66,7 +66,6 @@
 (setq-default indent-tabs-mode nil)
 
 ;; my lisp functions
-
 ;; insert date by %y%m%d %T
 (progn
 (defun insert-current-date () (interactive)
@@ -112,10 +111,10 @@
 
 
 ;; emacsclient
-(use-package server
-  :config
-  (unless (server-running-p)
-    (server-start)))
+;;(use-package server
+;;  :config
+;;  (unless (server-running-p)
+;;    (server-start)))
 
 ;; recent file log
 (use-package recentf
@@ -129,7 +128,7 @@
   (show-paren-mode 1))
 (use-package elec-pair
   :config
-  (electric-pair-mode 1))
+  (electric-pair-mode -1))
 
 ;; Garbbage collection magic hack
 (setq gc-cons-percentage 0.2
@@ -137,9 +136,9 @@
 (setq garbage-collection-messages t)
 
 ;; 4 long line file
-(use-package so-long
-  :init
-  (global-so-long-mode 1))
+;;(use-package so-long
+;;  :init
+;;  (global-so-long-mode 1))
 
 ;; 4 performance
 (setq blink-matching-paren nil)
@@ -153,7 +152,11 @@
 (setq ffap-machine-p-known 'reject)
 (setq idle-update-delay 1.0)
 (setq redisplay-skip-fontification-on-input t)
-(setq command-line-ns-option-alist nil) ;;4 mac
+;;(setq command-line-ns-option-alist nil) ;;4 mac
+(unless (eq system-type 'darwin)
+  (setq command-line-ns-option-alist nil))
+(unless (eq system-type 'gnu/linux)
+  (setq command-line-x-option-alist nil))
 
 ;; org-things
 (use-package org
@@ -540,14 +543,14 @@
   (add-hook 'kill-emacs-hook #'fontaine-store-latest-preset))
 
 ;; everforest theme
-(add-to-list 'custom-theme-load-path "~/.emacs.d/everforest-theme")
+;;(add-to-list 'custom-theme-load-path "~/.emacs.d/everforest-theme")
 ;; (load-theme 'everforest-hard-dark t)
 
 (use-package ef-themes
   :config
   (setq ef-themes-mixed-fonts t
         ef-themes-variable-pitch-ui t)
-  ;; (load-theme 'ef-melissa-light t) ;; best theme. really like this one.
+  (load-theme 'ef-melissa-light t) ;; best theme. really like this one.
   ;; (load-theme 'ef-melissa-dark t)
   ;; (load-theme 'ef-spring t)
   ;; (load-theme 'ef-dream t)
@@ -597,7 +600,7 @@
   :ensure t
   :config
   ;;(load-theme 'gruvbox-dark-soft t)
-  (load-theme 'gruvbox-light-soft t)
+  ;;(load-theme 'gruvbox-light-soft t)
   )
 
 (use-package unicode-fonts
@@ -641,14 +644,14 @@
 ;; c-mode-hook
 (add-hook 'c-mode-hook (lambda()
 			    (setq-default)
-			    (setq tab-width 8)
-			    (setq standard-indent 8)
+			    (setq tab-width 4)
+			    (setq standard-indent 4)
 			    (setq ident-tabs-mode nil)))
 ;; auto-sudoedit
-(use-package auto-sudoedit
-  :ensure t
-  :config
-  (auto-sudoedit-mode 1))
+;;(use-package auto-sudoedit
+;;  :ensure t
+;;  :config
+;;  (auto-sudoedit-mode 1))
 
 ;; editor config
 (use-package editorconfig
@@ -658,8 +661,9 @@
 
 ;; terminal-emulator
 ;; installed vterm-module in home.nix(nixos)
-(use-package vterm
-  :ensure t)
+;; switched to eshell
+;;(use-package vterm
+;;  :ensure t)
 
 ;; ;; evil-mode
 (use-package evil
@@ -724,11 +728,11 @@
   (puni-global-mode 1))
 
 ;; auto setup tree-sitter
-(use-package treesit-auto
-  :config
-  (setq treesit-auto-install 'prompt)
-  (treesit-auto-add-to-auto-mode-alist 'all)
-  (global-treesit-auto-mode 1))
+;;(use-package treesit-auto
+;;  :config
+;;  (setq treesit-auto-install 'prompt)
+;;  (treesit-auto-add-to-auto-mode-alist 'all)
+;;  (global-treesit-auto-mode 1))
 
 
 (use-package hl-todo
@@ -826,23 +830,16 @@
   :config
   (eglot-x-setup))
 
-(use-package lsp-snippet
-  ;; :vc ( :fetcher github :repo "svaante/lsp-snippet")
-  :vc (lsp-snippet :url "https://github.com/svaante/lsp-snippet"
-                   :branch "main")
-  :config
-  (when (featurep 'eglot)
-    (lsp-snippet-tempel-eglot-init)))
-
 ;; eglot boost 
 ;; build by binary (arm mac)
 ;; ~/usr/local/bin
-;; disabled 04-05-25 (emacs 30.1 provide more efficient JSON parser)
-;; (use-package eglot-booster
-;;   :after eglot
+(use-package eglot-booster
+:after eglot
 ;;   :vc ( :fetcher github :repo "jdtsmith/eglot-booster")
-;;   :config
-;;   (eglot-booster-mode 1))
+:vc (:url "https://github.com/jdtsmith/eglot-booster"
+     :branch "main")
+:config
+(eglot-booster-mode))
 
 (use-package eldoc-box
   :hook (eglot-managed-mode . eldoc-box-hover-mode))
@@ -1024,52 +1021,9 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(custom-safe-themes
-   '("7b602fe4a324dc18877dde647eb6f2ff9352566ce16d0b888bfcb870d0abfd70"
-     "faf642d1511fb0cb9b8634b2070a097656bdb5d88522657370eeeb11baea4a1c"
-     "fbf73690320aa26f8daffdd1210ef234ed1b0c59f3d001f342b9c0bbf49f531c"
-     "2e7dc2838b7941ab9cabaa3b6793286e5134f583c04bde2fba2f4e20f2617cf7"
-     "71b688e7ef7c844512fa7c4de7e99e623de99a2a8b3ac3df4d02f2cd2c3215e7"
-     "d41229b2ff1e9929d0ea3b4fde9ed4c1e0775993df9d998a3cdf37f2358d386b"
-     "712dda0818312c175a60d94ba676b404fc815f8c7e6c080c9b4061596c60a1db"
-     "d5fd482fcb0fe42e849caba275a01d4925e422963d1cd165565b31d3f4189c87"
-     "75b371fce3c9e6b1482ba10c883e2fb813f2cc1c88be0b8a1099773eb78a7176"
-     "5aedf993c7220cbbe66a410334239521d8ba91e1815f6ebde59cecc2355d7757"
-     "18a1d83b4e16993189749494d75e6adb0e15452c80c431aca4a867bcc8890ca9"
-     "4c16a8be2f20a68f0b63979722676a176c4f77e2216cc8fe0ea200f597ceb22e"
-     "ffa78fc746f85d1c88a2d1691b1e37d21832e9a44a0eeee114a00816eabcdaf9" default))
- '(package-selected-packages
-   '(ace-window all-the-icons-dired all-the-icons-ibuffer auto-package-update
-                auto-sudoedit cape cargo-mode catppuccin-theme clang-format
-                color-theme-sanityinc-tomorrow consult-eglot corfu-prescient
-                corfu-terminal dashboard diff-hl difftastic doom-modeline
-                dracula-theme ef-themes eglot-booster
-                eglot-signature-eldoc-talkative eglot-tempel eglot-x eldoc-box
-                elpy embark-consult evil-collection exec-path-from-shell
-                fish-mode flx flymake-collection fontaine geiser-guile go-mode
-                gruvbox-theme highlight-defined highlight-indent-guides
-                highlight-quoted imenu-list key-chord kotlin-mode lin
-                lsp-snippet magit-gitflow magit-todos marginalia modus-themes
-                nerd-icons-completion nerd-icons-corfu nerd-icons-dired nix-mode
-                orderless org-modern org-modern-indent org-pomodoro ox-qmd puni
-                python-black rainbow-delimiters rg ruff-format rustic simple
-                sql-indent sqlformat symbol-overlay tabnine tempel-collection
-                tide treesit-auto tuareg typescript-mode undo-fu undo-fu-session
-                undo-tree unicode-fonts vc-use-package vertico-prescient
-                vertico-truncate vterm vundo zig-mode))
  '(package-vc-selected-packages
-   '((eglot-booster :vc-backend Git :url
-                    "https://github.com/jdtsmith/eglot-booster")
-     (lsp-snippet :vc-backend Git :url "https://github.com/svaante/lsp-snippet")
-     (eglot-x :vc-backend Git :url "https://github.com/nemethf/eglot-x")
-     (vertico-truncate :vc-backend Git :url
-                       "https://github.com/jdtsmith/vertico-truncate")
-     (nerd-icons-corfu :vc-backend Git :url
-                       "https://github.com/LuigiPiucco/nerd-icons-corfu")
-     (org-modern-indent :vc-backend Git :url
-                        "https://github.com/jdtsmith/org-modern-indent")
-     (vc-use-package :vc-backend Git :url
-                     "https://github.com/slotThe/vc-use-package"))))
+   '((eglot-booster :url "https://github.com/jdtsmith/eglot-booster" :branch "main")
+     (eglot-x :url "https://github.com/nemethf/eglot-x" :branch "main"))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
