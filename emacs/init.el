@@ -460,9 +460,12 @@
   ;; (load-theme 'catppuccin t)
   )
 
+(load-theme 'modus-operandi t)
+
 (use-package dracula-theme
   :config
-  (load-theme 'dracula t))
+  ;; (load-theme 'dracula t)
+  )
 
 (use-package ef-themes
   :config
@@ -527,13 +530,10 @@
   :ensure t
   :config
   (add-to-list 'auto-mode-alist '("\\.go\\'" . go-mode))
-  ;; (setq gofmt-command "goimports")
   (add-hook 'go-mode-hook (lambda()
         		    (setq-default)
         		    (setq tab-width 4)
-        		    (setq standard-indent 4)
-        		    (setq ident-tabs-mode nil)))
-  ;; (add-hook 'before-save-hook 'gofmt-before-save)
+        		    (setq standard-indent 4)))
   )
 
 ;; Lua
@@ -541,7 +541,7 @@
   :mode "\\.lua\\'")
 
 ;; Lisp
-(use-package sly) ;; TODO: compatibility with corfu
+;; (use-package sly) ;;FIXME: compatibility with corfu
 (use-package lispy
   :hook
   (emacs-lisp-mode . lispy-mode))
@@ -869,8 +869,8 @@
    "M-p &" 'cape-sgml
    "M-p r" 'cape-rfc1345)
   :init
-  (add-to-list 'completion-at-point-functions #'cape-file)
-  (add-to-list 'completion-at-point-functions #'cape-dabbrev))
+  (add-hook 'completion-at-point-functions #'cape-file)
+  (add-hook 'completion-at-point-functions #'cape-dabbrev))
 
 ;; Convert the company-reftex-labels backend to a capf using cape and activate in in LaTeX-mode
 (use-package company-reftex
