@@ -348,10 +348,43 @@
 ;; https://karthinks.com/software/avy-can-do-anything/
 (use-package avy
   :demand t
-  :bind
-  ("C-:" . avy-goto-char)
-  ("C-'" . avy-goto-char-2)
-  ("M-g f" . avy-goto-line))
+  ;; :bind
+  ;; (("C-:" . avy-goto-char)
+  ;; ("C-'" . avy-goto-char-2)
+  ;; ("M-g f" . avy-goto-line)))
+  :init
+  (defun sn0w/avy-action-insert-newline (pt)
+      (save-excursion
+        (goto-char pt)
+        (newline))
+      (select-window
+       (cdr
+        (ring-ref avy-ring 0))))
+    (defun sn0w/avy-action-kill-whole-line (pt)
+      (save-excursion
+        (goto-char pt)
+        (kill-whole-line))
+      (select-window
+       (cdr
+        (ring-ref avy-ring 0))))
+    (defun sn0w/avy-action-embark (pt)
+      (unwind-protect
+          (save-excursion
+            (goto-char pt)
+            (embark-act))
+        (select-window
+         (cdr (ring-ref avy-ring 0))))
+      t) ;; adds an avy action for embark
+    :general
+    (general-def '(normal motion)
+      "s" 'evil-avy-goto-char-timer
+      "f" 'evil-avy-goto-char-in-line
+      "gl" 'evil-avy-goto-line ;; this rules
+      ";" 'avy-resume)
+    :config
+    (setf (alist-get ?. avy-dispatch-alist) 'sn0w/avy-action-embark ;; embark integration
+          (alist-get ?i avy-dispatch-alist) 'sn0w/avy-action-insert-newline
+          (alist-get ?K avy-dispatch-alist) 'sn0w/avy-action-kill-whole-line))
 
 (use-package link-hint
   :demand t
@@ -459,8 +492,10 @@
   (setq catppuccin-height-title1 1.5)
   ;; (load-theme 'catppuccin t)
   )
+;; (add-to-list 'custom-theme-load-path "~/.emacs.d/everforest-theme")
+;; (load-theme 'everforest-hard-dark t)
 
-(load-theme 'modus-operandi t)
+;; (load-theme 'modus-operandi t)
 
 (use-package dracula-theme
   :config
@@ -471,7 +506,7 @@
   :config
   (setq ef-themes-mixed-fonts t
         ef-themes-variable-pitch-ui t)
-  ;;(load-theme 'ef-melissa-light t)
+  ;; (load-theme 'ef-melissa-light t)
   )
 
 (use-package doom-themes
@@ -479,8 +514,7 @@
   ;; Global settings (defaults)
   (setq doom-themes-enable-bold t ; if nil, bold is universally disabled
         doom-themes-enable-italic t)
-                                        ; if nil, italics is universally disabled
-  ;; (load-theme 'doom-nord t)
+  (load-theme 'doom-gruvbox t)
 
   ;; Enable flashing mode-line on errors
   (doom-themes-visual-bell-config)
@@ -542,12 +576,6 @@
 
 ;; Lisp
 ;; (use-package sly) ;;FIXME: compatibility with corfu
-(use-package lispy
-  :hook
-  (emacs-lisp-mode . lispy-mode))
-
-(use-package lispyville
-  :hook (lispy-mode . lispyville-mode))
 
 ;; JS
 (use-package js2-mode)
@@ -555,6 +583,9 @@
 ;; Ocaml
 (use-package tuareg
   :ensure t)
+
+;; Python
+(setq python-shell-interpreter "/opt/homebrew/bin/python3.13")
 
 ;; Sql
 (use-package sql-indent
@@ -736,7 +767,18 @@
 
 ;; TODO: Org-Transclusion, Org-noter, Org-roam
 ;; https://nobiot.github.io/org-transclusion/
-
+(use-package org-noter
+  :commands
+  org-noter
+  :general
+  (sn0w/local-leader-keys
+    :keymaps 'org-noter-doc-mode-map
+    "i" 'org-noter-insert-note)
+  :config
+  (setq org-noter-notes-search-path (list sn0w/notes-path))
+  (setq org-noter-default-notes-file-names '("literature-notes.org"))
+  (setq org-noter-hide-other nil)
+  (setq org-noter-always-create-frame nil))
 
 ;;
 ;; Completion
@@ -754,6 +796,8 @@
   :general
   (:keymaps 'vertico-map
             ;; keybindings to cycle through vertico results.
+	    "C-j" 'vertico-next
+            "C-k" 'vertico-previous
             "C-f" 'vertico-exit
             "<backspace>" 'vertico-directory-delete-char
             "C-<backspace>" 'vertico-directory-delete-word
@@ -784,6 +828,19 @@
 
 (use-package consult
   :demand t
+  :general
+    (sn0w/leader-keys
+    "bb" '(consult-buffer :wk "consult buffer")
+    "Bb" '(consult-bookmark :wk "consult bookmark")
+    "ht" '(consult-theme :wk "consult theme")
+    "sr" '(consult-ripgrep :wk "consult rg")
+    "sg" '(consult-grep :wk "consult grep")
+    "sG" '(consult-git-grep :wk "consult git grep")
+    "sf" '(consult-find :wk "consult find")
+    "sF" '(consult-locate :wk "consult locate")
+    "sl" '(consult-line :wk "consult line")
+    "sy" '(consult-yank-from-kill-ring :wk "consult yank from kill ring")
+    "i" '(consult-imenu :wk "consult imenu"))
   :config  ;;use project.el to retrieve the project root
   (setq consult-project-root-function
         (lambda ()
@@ -793,6 +850,10 @@
 (use-package affe
   :demand t
   :after orderless
+  :general
+  (sn0w/leader-keys
+    "sa" '(affe-grep :wk "affe grep")
+    "sw" '(affe-find :wk "affe find"))
   :init
   (defun affe-orderless-regexp-compiler (input _type _ignorecase)
     (setq input (orderless-pattern-compiler input))
@@ -801,15 +862,17 @@
   (setq affe-regexp-compiler #'affe-orderless-regexp-compiler))
 
 (use-package embark
-  :ensure t
-
-  :bind
-  (("C-." . embark-act)         ;; pick some comfortable binding
-   ("C-;" . embark-dwim)        ;; good alternative: M-.
-   ("C-h B" . embark-bindings)) ;; alternative for `describe-bindings'
-
+  :demand t
+  :general
+  (sn0w/leader-keys
+     "." 'embark-act) ;; easily accessible 'embark-act' binding.
+  ("C-." 'embark-act) ;; overlaps with evil-repeat 
+  ("C-;" 'embark-dwim) ;; overlaps with IEdit
+  (:keymaps 'vertico-map
+            "C-." 'embark-act) ;; embark on completion candidates
+  (:keymaps 'embark-heading-map
+            "l" 'org-id-store-link)
   :init
-
   ;; Optionally replace the key help with a completing-read interface
   (setq prefix-help-command #'embark-prefix-help-command)
 
@@ -844,11 +907,26 @@
   (global-corfu-mode)
   :custom
   (corfu-cycle t) ;; allows cycling through candidates
-  (corfu-auto nil) ;; disables auto-completion
+  (corfu-auto t) ;; enables auto-completion
+  (corfu-on-exact-match nil)
+  (corfu-count 8)
+  (corfu-auto-prefix 1)
+  (corfu-auto-delay 0)
   :bind
   :general
   (:keymaps 'corfu-map
             "SPC" 'corfu-insert-separator)) ;; for compatibility with orderless
+
+(use-package corfu-popupinfo
+  :ensure nil
+  :after corfu
+  :hook
+  (corfu-mode . corfu-popupinfo-mode)
+  :custom
+  (corfu-popupinfo-delay '(0.25 . 0.1))
+  (corfu-popupinfo-hide nil)
+  :config
+  (corfu-popupinfo-mode))
 
 (use-package cape
   :demand t
@@ -997,48 +1075,61 @@
 
 (use-package lsp-ui
   :after lsp-mode
-  :commands lsp-ui-mode)
-
-(use-package ccls
+  :commands lsp-ui-mode
   :hook
-  ((c-mode c++-mode objc-mode cuda-mode) .
-   (lambda () (require 'ccls) (lsp))))
+  (lsp-mode . lsp-ui-mode)
+  :config
+  (setq lsp-ui-doc-enable t
+	lsp-ui-doc-use-webkit t
+	lsp-ui-doc-include-signature t
+        lsp-ui-sideline-show-hover t ; show hover actions in the sideline
+        lsp-ui-doc-use-childframe nil ; childframe has bugs (12/2020); nil works fine
+        lsp-ui-sideline-enable nil ; turn off the whole sideline (right sidebar doc & actions)
+	))
 
-(use-package lsp-pyright
-  :demand t
-  :custom
-  (lsp-pyright-langserver-command "pyrgiht")
-  :hook
-  (python-mode . (lambda ()
-                   (require 'lsp-pyright)
-                   (lsp))))
+;; ccls has bugs
+;; (use-package ccls
+;;   :hook
+;;   ((c-mode c++-mode objc-mode cuda-mode) .
+;;    (lambda () (require 'ccls) (lsp))))
+
+;; switched ruff
+;; (use-package lsp-pyright
+;;   :demand t
+;;   :custom
+;;   (lsp-pyright-langserver-command "pyrgiht")
+;;   :hook
+;;   (python-mode . (lambda ()
+;;                    (require 'lsp-pyright)
+;;                    (lsp))))
 
 ;; Eglot
 (use-package jsonrpc :ensure (:wait t) :defer t)
 (use-package eglot
   :ensure nil
   :init (setq completion-category-overrides '((eglot (styles orderless))))
+  (setq eglot-send-changes-idle-time 1.0)
   :commands eglot
   :config
+  (add-to-list 'eglot-server-programs '(c-mode .("clangd")))
+  (add-to-list 'eglot-server-programs '(c++-mode .("clangd")))
+  (add-to-list 'eglot-server-programs '(objc-mode .("clangd")))
+  (add-to-list 'eglot-server-programs '(cuda-mode .("clangd")))
+  (add-to-list 'eglot-server-programs '(python-mode .("ruff" "server")))
   )
 
 ;; eldoc
-;; there has some hack
-;; (use-package eldoc
-;;   :preface
-;;   (unload-feature 'eldoc t)
-;;   (setq custom-delayed-init-variables '())
-;;   (defvar global-eldoc-mode nil)
-;;   :config
-;;   (global-eldoc-mode))
+(use-package eldoc-box
+  :ensure (:wait t)
+  :after eglot)
 
 ;; Ace window
-;; (use-package ace-window
-;;   :demand t
-;;   :general
-;;   ("M-o" 'ace-window)
-;;   :config
-;;   (setq aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l)))
+(use-package ace-window
+  :demand t
+  :general
+  ("M-o" 'ace-window)
+  :config
+  (setq aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l)))
 
 ;; Rainbow mode
 (use-package rainbow-mode)
