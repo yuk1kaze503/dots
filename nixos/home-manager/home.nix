@@ -76,6 +76,8 @@ in
     unstable.nodejs
     unstable.nodePackages.npm
     unstable.nodePackages.typescript
+    bun  # js runtime
+    deno # js runtime
     ocaml
     go
     ruby
