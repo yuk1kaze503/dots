@@ -86,7 +86,8 @@ in
     # lsp
     unstable.rust-analyzer
     gopls
-    python310Packages.python-lsp-server
+    python313Packages.python-lsp-server
+    basepyright
     kotlin-language-server
     java-language-server
     unstable.nodePackages.typescript-language-server
