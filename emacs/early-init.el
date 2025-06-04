@@ -8,6 +8,7 @@
 (tool-bar-mode -1) ;; disables toolbar
 (scroll-bar-mode -1) ;; disables scrollbar
 (pixel-scroll-precision-mode 1) ;; enable smooth scrolling
+(setq frame-resize-pixelwise t) ;; fitting the window within a tilling env
 
 (setq user-emacs-directory (file-truename "~/.emacs.d/"))
 (setq inhibit-splash-screen t ;; no thanks

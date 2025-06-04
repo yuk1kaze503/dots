@@ -69,6 +69,8 @@
 (defvar sn0w/org-path "~/Documents/frx/org"
   "Org path.")
 
+(defvar sn0w/global-bib-file "~/Documents/frx/bibtex/bib/master.bib"
+  "Bibliography.")
 ;;
 ;; Emacs 
 ;;
@@ -191,6 +193,7 @@
   (setq evil-undo-system 'undo-redo) ;; undo via 'u', and redo the undone change via 'C-r'; only available in emacs 28+.
   :config
   (evil-mode t) ;; globally enable evil mode
+  ;; (define-key evil-insert-state-map (kbd "C-[") 'evil-normal-state)
   (define-key evil-insert-state-map (kbd "C-e") 'end-of-line)
   (define-key evil-insert-state-map (kbd "C-p") 'evil-previous-line)
   (define-key evil-insert-state-map (kbd "C-n") 'evil-next-line)
@@ -342,7 +345,101 @@
   ;; templating
   ;; see 'tempel'
   (sn0w/leader-keys
-    "t" '(:ignore t :wk "template")))
+    "t" '(:ignore t :wk "template"))
+  ;; yasnippet
+  ;; see 'yasnippet'
+  (sn0w/leader-keys
+    "y" '(:ignore t :wk "yasnippet"))
+  )
+
+;; Org
+(use-package org
+  :ensure (:wait t)
+  :demand t
+  :init
+  ;; edit settings (recommended by org-modern)
+  (setq org-auto-align-tags nil
+            org-tags-column 0
+            org-catch-invisible-edits 'show-and-error
+            org-special-ctrl-a/e t ;; special navigation behaviour in headlines
+            org-insert-heading-respect-content t)
+
+  ;; styling, hide markup, etc. (recommended by org-modern)
+  (setq org-hide-emphasis-markers t
+            org-src-fontify-natively t ;; fontify source blocks natively
+            org-highlight-latex-and-related '(native) ;; fontify latex blocks natively
+            org-pretty-entities t)
+
+  ;; agenda styling (recommended by org-modern)
+  (setq org-agenda-tags-column 0
+            org-agenda-block-separator ?─
+            org-agenda-time-grid
+            '((daily today require-timed)
+              (800 1000 1200 1400 1600 1800 2000)
+              " ┄┄┄┄┄ " "┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄")
+            org-agenda-current-time-string
+            "⭠ now ─────────────────────────────────────────────────")
+
+  (setq org-ellipsis "...")
+
+  ;; todo setup
+  (setq org-todo-keywords
+            ;; it's extremely useful to distinguish between short-term goals and long-term projects
+            '((sequence "TODO(t)" "SOMEDAY(s)" "|" "DONE(d)")
+              (sequence "TO-READ(r)" "READING(R)" "|" "HAVE-READ(d)")
+              (sequence "PROJ(p)" "|" "COMPLETED(c)")))
+
+
+  (setq org-adapt-indentation nil) ;; interacts poorly with 'evil-open-below'
+
+  :custom
+  (org-cite-global-bibliography (list sn0w/global-bib-file))
+  ;; handle citations using citar
+  (org-cite-insert-processor 'citar)
+  (org-cite-follow-processor 'citar)
+  (org-cite-activate-processor 'citar)
+  :general
+  (sn0w/local-leader-keys
+        :keymaps 'org-mode-map
+        "a" '(org-archive-subtree :wk "archive")
+        "c" '(org-cite-insert :wk "insert citation")
+        "l" '(:ignore t :wk "link")
+        "ll" '(org-insert-link t :wk "link")
+        "lp" '(org-latex-preview t :wk "prev latex")
+        "h" '(consult-org-heading :wk "consult heading")
+        "d" '(org-cut-special :wk "org cut special")
+        "y" '(org-copy-special :wk "org copy special")
+        "p" '(org-paste-special :wk "org paste special")
+        "b" '(:keymap org-babel-map :wk "babel")
+        "t" '(org-todo :wk "todo")
+        "s" '(org-insert-structure-template :wk "template")
+        "e" '(org-edit-special :wk "edit")
+        "i" '(:ignore t :wk "insert")
+        "ih" '(org-insert-heading :wk "insert heading")
+        "is" '(org-insert-subheading :wk "insert heading")
+        "f" '(org-footnote-action :wk "footnote action")
+        ">" '(org-demote-subtree :wk "demote subtree")
+        "<" '(org-promote-subtree :wk "demote subtree"))
+  (:keymaps 'org-agenda-mode-map
+                "j" '(org-agenda-next-line)
+                "h" '(org-agenda-previous-line))
+
+  :hook
+  (org-mode . olivetti-mode)
+  (org-mode . variable-pitch-mode)
+  (org-mode . (lambda () (electric-indent-local-mode -1))) ;; disable electric indentation
+
+  :config
+  (set-face-attribute 'org-ellipsis nil :inherit 'default :box nil)
+  (add-to-list 'org-latex-packages-alist '("" "braket" t))
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((js . t)
+         (emacs-lisp . t)
+         (awk . t)))
+  ;; set up org paths
+  (setq org-directory "~/Documents/frx/org/agenda")
+  (setq org-default-notes-file (concat org-directory "/notes.org")))
 
 ;; Avy can do anything
 ;; https://karthinks.com/software/avy-can-do-anything/
@@ -470,12 +567,12 @@
                '((regular
                   :default-family "ComicShannsMono Nerd Font"
                   :fixed-pitch-family "ComicShannsMono Nerd Font"
-                  :variable-pitch-family "JuliaMono"
-                  :italic-family "JuliaMono"
+                  :variable-pitch-family "HackNerdFontMono"
+                  :italic-family "HackNerdFontMono"
                   :default-height 240)
                  (large
                   :default-family "ComicShannsMono Nerd Font"
-                  :variable-pitch-family "JuliaMono"
+                  :variable-pitch-family "HackNerdFontMono"
                   :default-height 300)))
  (fontaine-set-preset (or (fontaine-restore-latest-preset) 'regular))
   (add-hook 'kill-emacs-hook #'fontaine-store-latest-preset))
@@ -521,6 +618,20 @@
   ;; Corrects (and improves) org-mode's native fontification.
   (doom-themes-org-config))
 
+(use-package indent-bars
+  :hook
+  ((python-mode yaml-mode) . indent-bars-mode)
+  :custom
+  (setq
+   indent-bars-color '(highlight :face-bg t :blend 0.2)
+   indent-bars-pattern "."
+   indent-bars-width-frac 0.1
+   indent-bars-pad-frac 0.1
+   indent-bars-zigzag nil
+   indent-bars-color-by-depth nil
+   indent-bars-highlight-current-depth nil
+   indent-bars-display-on-blank-lines nil)) 
+
 (use-package hl-todo
   :demand t
   :init
@@ -530,9 +641,60 @@
 ;; Organization
 ;;
 
+;; Popper
+;; https://github.com/karthink/popper
+(use-package popper
+  :demand t
+  :general
+  (sn0w/leader-keys
+        "bp" '(:ignore t :wk "popper")
+        "bpc" '(popper-cycle t :wk "cycle")
+        "bpt" '(popper-toggle-latest t :wk "toggle latest")
+        "bpb" '(popper-toggle-type t :wk "toggle type")
+        "bpk" '(popper-kill-latest-popup t :wk "kill latest"))
+  :init
+  (setq popper-reference-buffers
+        '("\\*Messages\\*"
+          "Output\\*$"
+          "\\*helpful"
+          "\\*Async Shell Command\\*"
+          help-mode
+          compilation-mode
+          magit-process-mode
+          "^\\*eshell.*\\*" eshell-mode
+          "\\*direnv\\*"
+          "\\*elfeed-log\\*"
+          "\\*Async-native-compile-log\\*"
+          "\\*TeX Help\\*"
+          "\\*Embark Collect Live\\*"))
+  (popper-mode +1)
+  (popper-echo-mode +1))
+
+;; Bufler
+;; https://github.com/alphapapa/bufler.el
+(use-package bufler
+  :demand t
+  :custom
+  (bufler-workspace-mode t)
+  ;; (bufler-workspace-tabs-mode t)
+  :general
+  (sn0w/leader-keys
+    "bB" '(bufler :wk "bufler") ;; overrides consult
+    "bf" '(bufler-workspace-frame-set :wk "bufler workspace frame set")
+    "bl" '(bufler-list :wk "bufler list"))
+  (:keymaps 'bufler-list-mode-map
+            :states 'normal
+            "?" 'hydra:bufler/body
+            "RET" 'bufler-list-buffer-switch
+            "SPC" 'bufler-list-buffer-peek
+            "d" 'bufler-list-buffer-kill))
+
 ;; Projects
 (use-package project
-  :ensure nil)
+  :ensure nil
+  :general
+  (sn0w/leader-keys
+    "p" '(:keymap project-prefix-map :wk "project")))
 
 ;; Dired
 (use-package dired
@@ -585,7 +747,43 @@
   :ensure t)
 
 ;; Python
-(setq python-shell-interpreter "/opt/homebrew/bin/python3.13")
+;; (setq python-shell-interpreter "/opt/homebrew/bin/ipython")
+(use-package python-mode
+  :config
+  (setq python-indent 4)
+  )
+
+(use-package blacken
+    :hook (python-mode . blacken-mode)
+    :config
+    (setq blacken-line-length '88))
+
+(use-package py-vterm-interaction
+  :general
+  (sn0w/local-leader-keys
+    :keymaps 'py-vterm-interaction-mode-map
+    "C-b" '(py-vterm-interaction-send-buffer :wk "send the whole content")
+    "C-c" '(py-vterm-interaction-send-region-or-current-line :wk "run current line")
+    "C-z" '(py-vterm-interaction-switch-to-repl-buffer :wk "switch to repl")
+    "C-j" '(py-vterm-interaction-send-current-cell :wk "send the current cell")
+    "C-f" '(py-vterm-interaction-run-current-function :wk "send the current function")
+    "C-r" '(py-vterm-interaction-send-run-buffer-file :wk "ipython %run magic")
+    "C-a" '(py-vterm-interaction-send-rerun-last :wk "rerun the last")
+    "C-t" '(py-vterm-interaction-repl-copy-mode :wk "copy mode")
+    "M-k" '(py-vterm-interaction-repl-clear-buffer :wk "Clear"))
+            
+  :hook (python-mode . py-vterm-interaction-mode)
+  :config
+  (setq py-vterm-interaction-repl-program "ipython -i")
+  (setq py-vterm-interaction-silent-cells t)
+  )
+(use-package lsp-pyright
+  :ensure t
+  :custom (lsp-pyright-langserver-command "basedpyright") 
+  :hook (python-mode . (lambda ()
+                          (require 'lsp-pyright)
+                          (lsp))))
+
 
 ;; Sql
 (use-package sql-indent
@@ -767,6 +965,48 @@
 
 ;; TODO: Org-Transclusion, Org-noter, Org-roam
 ;; https://nobiot.github.io/org-transclusion/
+;; (use-package org-roam
+;;   :demand t
+;;   :general
+;;   (sn0w/leader-keys
+;;     "nr" '(:ignore t :wk "roam")
+;;     "nri" '(org-roam-node-insert t :wk "insert node")
+;;     "nrt" '(org-roam-buffer-toggle t :wk "roam buffer toggle")
+;;     "nrc" '(org-roam-capture t :wk "roam capture")
+;;     "nrf" '(org-roam-node-find :wk "find node")
+;;     "nrd" '(:ignore t :wk "dailies")
+;;     "nrdt" '(org-roam-dailies-goto-today :wk "today")
+;;     "nrdt" '(org-roam-dailies-goto-yesterday :wk "today")
+;;     "nrdT" '(org-roam-dailies-goto-tomorrow :wk "today")
+;;     "nrdd" '(org-roam-dailies-goto-date :wk "goto date"))
+;;   :config
+;;   ;; org-roam-buffer
+;;   (add-to-list 'display-buffer-alist
+;;                '("\\*org-roam\\*"
+;;                  (display-buffer-in-direction)
+;;                  (direction . right)
+;;                  (window-width . 0.33)
+;;                  (window-height . fit-window-to-buffer)))
+;;   ;; get tags to show up in 'org-roam-node-find':
+;;   (setq org-roam-node-display-template
+;;         (concat "${title:*} "
+;;                 (propertize "${tags:10}" 'face 'org-tag)))
+;;   (setq org-roam-completion-everywhere t) ;; roam completion anywhere
+;;   (setq org-roam-directory patrl/notes-path)
+;;   (setq org-roam-db-location (concat org-roam-directory "/.database/org-roam.db"))
+;;   (unless (< emacs-major-version 29)
+;;     (setq org-roam-database-connector 'sqlite-builtin))
+;;   (org-roam-db-autosync-mode) ;; ensures that org-roam is available on startup
+
+
+;;   ;; dailies config
+;;   (setq org-roam-dailies-directory "daily/")
+;;   (setq org-roam-dailies-capture-templates
+;;         '(("d" "default" entry
+;;            "* %?"
+;;            :target (file+head "%<%Y-%m-%d>.org"
+;;                               "#+title: %<%Y-%m-%d>\n#+filetags: daily\n")))))
+
 (use-package org-noter
   :commands
   org-noter
@@ -907,7 +1147,7 @@
   (global-corfu-mode)
   :custom
   (corfu-cycle t) ;; allows cycling through candidates
-  (corfu-auto t) ;; enables auto-completion
+  (corfu-auto nil) ;; disables auto-completion
   (corfu-on-exact-match nil)
   (corfu-count 8)
   (corfu-auto-prefix 1)
@@ -965,6 +1205,11 @@
 
 (use-package flymake
   :ensure nil
+  :general
+  (sn0w/leader-keys
+    :keymaps 'flymake-mode-map
+    "cf" '(consult-flymake :wk "consult flymake") ;; depends on consult
+    "cc" '(flymake-mode :wk "toggle flymake")) ;; depends on consult 
   :hook
   (TeX-mode . flymake-mode) 
   (emacs-lisp-mode . flymake-mode)
@@ -1019,20 +1264,27 @@
 ;; Better search
 (use-package deadgrep
   :demand t
-  :bind ("<f5>" . dead-grep))
+  :bind ("<f5>" . deadgrep))
 
 ;; Yasnippet
 (use-package yasnippet
+  :general
+  (sn0w/leader-keys
+    "ys" '(yas-insert-snippet :wk "yas-insert-snippet"))
   :config
   (yas-reload-all)
-  (add-to-list 'yas-snippet-dirs "~/.emacs.d/snippets")
+  (add-to-list 'yas-snippet-dirs "~/.emacs.d/elpaca/builds/yasnippet-snippets/snippets")
   (yas-global-mode 1))
+
+(use-package yasnippet-snippets)
 
 ;; Tempel
 (use-package tempel
   :demand t
   :general
   ("M-p +" 'tempel-complete) ;; M-p completion prefix; see `cape'
+  (sn0w/leader-keys
+  "ti" '(tempel-insert :wk "tempel insert"))
   (:keymaps 'tempel-map
             "TAB" 'tempel-next) ;; progress through fields via `TAB'
   :init
@@ -1046,6 +1298,11 @@
 ;; Magit
 (use-package transient)
 (use-package magit
+  :after transient
+  :general
+  (sn0w/leader-keys
+    "g" '(:ignore t :wk "git")
+    "gg" '(magit-status :wk "status"))
   :config (global-set-key (kbd "C-x g") 'magit-status))
 
 (use-package magit-gitflow
@@ -1057,7 +1314,15 @@
 
 ;; Eshell
 (use-package eshell
-  :ensure nil)
+  :ensure nil
+  :general
+  (sn0w/leader-keys
+    "oe" '(eshell :wk "eshell")))
+;; Vterm
+(use-package vterm
+  :general
+  (sn0w/leader-keys
+    "vt" '(vterm :wk "vterm")))
 
 ;; LSP
 (use-package lsp-mode
@@ -1093,16 +1358,6 @@
 ;;   ((c-mode c++-mode objc-mode cuda-mode) .
 ;;    (lambda () (require 'ccls) (lsp))))
 
-;; switched ruff
-;; (use-package lsp-pyright
-;;   :demand t
-;;   :custom
-;;   (lsp-pyright-langserver-command "pyrgiht")
-;;   :hook
-;;   (python-mode . (lambda ()
-;;                    (require 'lsp-pyright)
-;;                    (lsp))))
-
 ;; Eglot
 (use-package jsonrpc :ensure (:wait t) :defer t)
 (use-package eglot
@@ -1115,13 +1370,15 @@
   (add-to-list 'eglot-server-programs '(c++-mode .("clangd")))
   (add-to-list 'eglot-server-programs '(objc-mode .("clangd")))
   (add-to-list 'eglot-server-programs '(cuda-mode .("clangd")))
-  (add-to-list 'eglot-server-programs '(python-mode .("ruff" "server")))
+  (add-to-list 'eglot-server-programs '(python-mode .("basedpyright-langserver" "--stdio")))
   )
 
 ;; eldoc
 (use-package eldoc-box
   :ensure (:wait t)
-  :after eglot)
+  :after eglot
+  :hook
+  (eglot-managed-mode . eldoc-box-hover-mode))
 
 ;; Ace window
 (use-package ace-window
