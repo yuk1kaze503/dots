@@ -563,16 +563,27 @@
 ;; Font
 (use-package fontaine
   :config
+; (setq fontaine-presets
+;                '((regular
+;                   :default-family "ComicShannsMono Nerd Font"
+;                   :fixed-pitch-family "ComicShannsMono Nerd Font"
+;                   :variable-pitch-family "HackNerdFontMono"
+;                   :italic-family "HackNerdFontMono"
+;                   :default-height 240)
+;                  (large
+;                   :default-family "ComicShannsMono Nerd Font"
+;                   :variable-pitch-family "HackNerdFontMono"
+;                   :default-height 300)))
 (setq fontaine-presets
                '((regular
-                  :default-family "ComicShannsMono Nerd Font"
-                  :fixed-pitch-family "ComicShannsMono Nerd Font"
-                  :variable-pitch-family "HackNerdFontMono"
-                  :italic-family "HackNerdFontMono"
+                  :default-family "Cascadia Code NF"
+                  :fixed-pitch-family "Cascadia Code NF"
+                  :variable-pitch-family "Cascadia Code NF"
+                  :italic-family "Cascadia Code NF"
                   :default-height 240)
                  (large
-                  :default-family "ComicShannsMono Nerd Font"
-                  :variable-pitch-family "HackNerdFontMono"
+                  :default-family "Cascadia Code NF"
+                  :variable-pitch-family "Cascadia Code NF"
                   :default-height 300)))
  (fontaine-set-preset (or (fontaine-restore-latest-preset) 'regular))
   (add-hook 'kill-emacs-hook #'fontaine-store-latest-preset))
@@ -587,7 +598,8 @@
   :demand t
   :config
   (setq catppuccin-height-title1 1.5)
-  ;; (load-theme 'catppuccin t)
+  (setq catppuccin-flavor 'frappe) ;; latte frappe macchiato mocha
+  (load-theme 'catppuccin t)
   )
 ;; (add-to-list 'custom-theme-load-path "~/.emacs.d/everforest-theme")
 ;; (load-theme 'everforest-hard-dark t)
@@ -611,7 +623,8 @@
   ;; Global settings (defaults)
   (setq doom-themes-enable-bold t ; if nil, bold is universally disabled
         doom-themes-enable-italic t)
-  (load-theme 'doom-gruvbox t)
+  ;; (load-theme 'doom-gruvbox t)
+  ;; (load-theme 'doom-solarized-dark t)
 
   ;; Enable flashing mode-line on errors
   (doom-themes-visual-bell-config)
@@ -779,11 +792,8 @@
   )
 (use-package lsp-pyright
   :ensure t
-  :custom (lsp-pyright-langserver-command "basedpyright") 
-  :hook (python-mode . (lambda ()
-                          (require 'lsp-pyright)
-                          (lsp))))
-
+  :config
+  (setq lsp-pyright-langserver-command "basedpyright"))
 
 ;; Sql
 (use-package sql-indent
@@ -1317,12 +1327,12 @@
   :ensure nil
   :general
   (sn0w/leader-keys
-    "oe" '(eshell :wk "eshell")))
+    "te" '(eshell :wk "eshell")))
 ;; Vterm
 (use-package vterm
   :general
   (sn0w/leader-keys
-    "vt" '(vterm :wk "vterm")))
+    "tv" '(vterm :wk "vterm")))
 
 ;; LSP
 (use-package lsp-mode
@@ -1348,7 +1358,7 @@
 	lsp-ui-doc-use-webkit t
 	lsp-ui-doc-include-signature t
         lsp-ui-sideline-show-hover t ; show hover actions in the sideline
-        lsp-ui-doc-use-childframe nil ; childframe has bugs (12/2020); nil works fine
+        lsp-ui-doc-use-childframe t ; childframe has bugs (12/2020); nil works fine
         lsp-ui-sideline-enable nil ; turn off the whole sideline (right sidebar doc & actions)
 	))
 
